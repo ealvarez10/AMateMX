@@ -25,6 +25,8 @@ All of them use only Mathlib and the axioms `propext`, `Classical.choice` and `Q
 
 For Dirichlet L-functions only one direction is formalized: the implication GRH ⇒ subpolynomial energy is not yet done.
 
+AMate’s prime-deficit criterion and Theorem 6.1 of Lee Crossley’s *The Crossley Criteria* both characterise RH by subpolynomial growth of a one-sided sum at fourth powers with weight $m^{-3}$ on arbitrarily late windows. Crossley applies the test to a Möbius remainder. [Theorem 6.1](https://github.com/leecrossley/crossley-criteria-riemann-hypothesis/blob/806ba8b6acba5dbef43ad394590585e8d09aa950/paper/crossley-criteria-riemann-hypothesis.md#L273-L293) and [DOI 10.5281/zenodo.24466908](https://doi.org/10.5281/zenodo.24466908).
+
 ## Build
 
 Requires [elan](https://github.com/leanprover/elan). The toolchain (Lean 4.33.1) is pinned in `lean-toolchain`, and Mathlib is pinned at revision `0df444a`.
