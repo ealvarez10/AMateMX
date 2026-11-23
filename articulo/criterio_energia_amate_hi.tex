@@ -1,0 +1,258 @@
+% मसौदा। संदर्भ 23 नवंबर 2026 को सत्यापित किए गए।
+% Hindi translation of criterio_energia_amate.tex. Compile with XeTeX (Tectonic).
+\documentclass[11pt,a4paper]{amsart}
+
+\usepackage[no-math]{fontspec}
+\setmainfont{Shobhika}[
+  Script=Devanagari,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Regular,
+  BoldItalicFont=*-Bold,
+  SlantedFont=*-Regular,
+  BoldSlantedFont=*-Bold,
+  SmallCapsFont=*-Regular]
+% Latin-script shaping for the author's name: under Script=Devanagari the
+% capital A-acute is shaped with a misplaced accent.
+\newfontfamily\latinfont{Shobhika}[
+  Script=Latin,
+  Extension=.otf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Regular,
+  BoldItalicFont=*-Bold,
+  SlantedFont=*-Regular,
+  BoldSlantedFont=*-Bold,
+  SmallCapsFont=*-Regular]
+% The danda ends a sentence: keep amsart from adding a period after it.
+\sfcode"0964=1001
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\renewcommand{\abstractname}{सार}
+\renewcommand{\refname}{संदर्भ}
+\renewcommand{\proofname}{प्रमाण}
+\renewcommand{\datename}{तिथि:}
+
+\newtheorem{teorema}{प्रमेय}
+\newtheorem{proposicion}[teorema]{प्रस्ताव}
+\newtheorem{lema}[teorema]{लेम्मा}
+\newtheorem{corolario}[teorema]{उपप्रमेय}
+\theoremstyle{definition}
+\newtheorem{definicion}[teorema]{परिभाषा}
+\theoremstyle{remark}
+\newtheorem{observacion}[teorema]{टिप्पणी}
+
+\renewcommand{\Re}{\operatorname{Re}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+
+\title[रीमान परिकल्पना के लिए एक ऊर्जा मानदंड]{रीमान परिकल्पना के लिए एक ऊर्जा मानदंड, उसका अंशांकन और Lean में उसका औपचारिक सत्यापन}
+\author{{\latinfont Ernesto \'Alvarez}}
+\thanks{यह कार्य {\latinfont Ernesto \'Alvarez} की परियोजना AMate का हिस्सा है। Lean लाइब्रेरी \texttt{AMateEnergia}, \texttt{AMateDirichlet} और \texttt{AMateMiller} इसी परियोजना की हैं। औपचारिक प्रमाण और संख्यात्मक जाँचें भाषा मॉडलों की सहायता से विकसित की गईं।}
+\date{23 नवंबर 2026 (मसौदा)}
+
+\begin{document}
+
+\begin{abstract}
+हम मोबियस फलन, भिन्नात्मक भागों और दो संशोधकों (correctors) से निर्मित एक स्पष्ट साक्षी $\sigma_Q$ तथा उसकी ऊर्जा $E_Q=\sum_{k\ge1}\sigma_Q(k)^2/(k(k+1))$ परिभाषित करते हैं। हम बिना किसी परिकल्पना के सिद्ध करते हैं कि
+\[
+  \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
+  \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
+\]
+विशेष रूप से, रीमान परिकल्पना $E_Q\ll_\varepsilon Q^\varepsilon$ के तुल्य है, और $\Re s>\theta$ में शून्यों का अभाव $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$ के तुल्य है। हम von Mangoldt योगों और अभाज्यों पर योगों के रूप में तुल्य सूत्रीकरण, एक अवरोध प्रमेय (barrier theorem) जो यह सीमांकित करता है कि कौन-सी विधियाँ इनमें से एक सूत्रीकरण को सिद्ध नहीं कर सकतीं, तथा डिरिक्ले $L$-फलनों तक मानदंड का विस्तार भी प्रस्तुत करते हैं। सभी परिणाम Mathlib के साथ Lean~4 में औपचारिक रूप से सिद्ध (formalized) हैं और केवल तीन मानक अभिगृहीतों पर निर्भर करते हैं। अंत में, हम इस मानदंड को उस Lean लाइब्रेरी के साथ संयोजित करते हैं जो रीमान परिकल्पना के एक प्रमाण की घोषणा करती है (Alp\"oge, 2026); उस लाइब्रेरी के संकलन को हम स्वतंत्र रूप से, MIT द्वारा प्रकाशित सत्यापन के सापेक्ष बाइट-दर-बाइट, पुनरुत्पादित करते हैं।
+\end{abstract}
+
+\maketitle
+
+\section{परिचय}
+
+Nyman और Beurling का मानदंड~\cite{Nyman,Beurling} रीमान परिकल्पना (RH) को भिन्नात्मक भाग के विस्फारणों (dilations) के संयोजनों द्वारा $L^2(0,1)$ में सन्निकटन की एक समस्या के रूप में व्यक्त करता है। Báez-Duarte~\cite{BaezDuarte} ने दिखाया कि प्राकृत संख्याओं द्वारा विस्फारण पर्याप्त हैं, और सन्निकटन की गति को शून्यों के वितरण से जोड़ा गया है~\cite{BalazardSaias,Burnol,BCF}। एक भिन्न प्रकृति की शास्त्रीय तुल्यता Littlewood की है: RH, $M(x)=\sum_{n\le x}\mu(n)\ll_\varepsilon x^{1/2+\varepsilon}$ के तुल्य है।
+
+यह कार्य भारों $w_k=1/(k(k+1))$ वाले अनुक्रमों की समष्टि में एक ठोस साक्षी प्रस्तावित करता है, जिसकी ऊर्जा शून्यों के भुज को \textbf{मापती} है: $E_Q$ का वृद्धि-घातांक ठीक $2\Theta-1$ है। सन्निकटन मानदंडों के विपरीत, जो $d_N\to0$ की माँग करते हैं, यहाँ ऊर्जा बढ़ सकती है, और जानकारी उसकी वृद्धि की गति में निहित है।
+
+\subsection*{परिणाम}
+\begin{itemize}
+\item प्रमेय~\ref{teo:calibracion}: घातांक का सूत्र, बिना किसी परिकल्पना के।
+\item प्रमेय~\ref{teo:theta}: शून्य-मुक्त अर्ध-तलों और ऊर्जा के परिबंधों (bounds) के बीच तुल्यता।
+\item प्रमेय~\ref{teo:recip}: वह स्पष्ट निम्न परिबंध जो क्रांतिक रेखा के बाहर स्थित कोई शून्य आरोपित करता है।
+\item खंड~\ref{sec:equiv}: तुल्य अंकगणितीय सूत्रीकरण और एक अवरोध प्रमेय।
+\item खंड~\ref{sec:dirichlet}: डिरिक्ले फलनों $L(s,\chi)$ तक विस्तार।
+\item खंड~\ref{sec:formal}: Lean में औपचारिकीकरण और Alp\"oge की लाइब्रेरी के साथ संयोजन।
+\end{itemize}
+
+\section{साक्षी और उसकी ऊर्जा}
+
+\begin{definicion}
+$Q\ge2$ और $k\ge1$ के लिए मान लीजिए $u_d(k)=\{k/d\}$, $m_Q=\sum_{d\le Q}\mu(d)/d$, $t_Q=1-\sum_{d\le Q}\mu(d)\log(Q/d)/d$, $\gamma_Q=Qt_Q/\log2$ और $h_Q=2u_{2Q}-u_Q$। हम परिभाषित करते हैं
+\[
+\varphi_Q=1+\sum_{d\le Q}\mu(d)\,u_d-Qm_Q\,u_Q,\qquad
+\sigma_Q=\varphi_Q-\gamma_Q h_Q,
+\]
+\[
+E_Q=\sum_{k\ge1}\sigma_Q(k)^2\,w_k,\qquad w_k=\frac1{k(k+1)}.
+\]
+\end{definicion}
+
+संबद्ध डिरिक्ले बहुपद निम्नलिखित है:
+\[
+P_Q(s)=\sum_{d\le Q}\mu(d)d^{-s}-Qm_QQ^{-s}-\gamma_Q\bigl(2(2Q)^{-s}-Q^{-s}\bigr).
+\]
+
+\begin{proposicion}\label{prop:mellin}
+\begin{enumerate}
+\item $1\le k<Q$ के लिए $\sigma_Q(k)=0$, और $E_Q\le 8(1+1/\log2)\,Q$।
+\item $\Re s>0$, $s\ne1$ के लिए: $\displaystyle\int_1^\infty\sigma_Q(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-\zeta(s)P_Q(s)}{s}$।
+\item $\displaystyle E_Q=\frac1{2\pi}\int_{\mathbb R}\frac{|1-\zeta(\tfrac12+ix)P_Q(\tfrac12+ix)|^2}{\tfrac14+x^2}\,dx$।
+\end{enumerate}
+\end{proposicion}
+
+दोनों संशोधक उन प्रवणताओं को निरस्त कर देते हैं जो $s=1$ पर $\zeta$ का ध्रुव $\sigma_Q$ में उत्पन्न करता; इसी कारण~(2) के Mellin रूपांतर का कोई ध्रुव नहीं है।
+
+\section{एक शून्य से प्राप्त निम्न परिबंध}
+
+\begin{teorema}\label{teo:recip}
+यदि $\Re\rho>1/2$ के साथ $\zeta(\rho)=0$ हो, तो प्रत्येक $Q\ge2$ के लिए
+\[
+\frac{2\Re\rho-1}{|\rho|^2}\le E_Q\,Q^{1-2\Re\rho}.
+\]
+\end{teorema}
+
+\begin{proof}
+प्रस्ताव~\ref{prop:mellin} के अनुसार, $s=\rho$ पर समाकल का मान $1/\rho$ है, और चूँकि $1<x<Q$ के लिए $\sigma_Q(\lfloor x\rfloor)=0$ है, इसलिए केवल $(Q,\infty)$ का योगदान होता है। Cauchy--Schwarz असमिका से,
+\[
+\frac1{|\rho|}\le\Bigl(\int_Q^\infty\sigma_Q(\lfloor x\rfloor)^2x^{-2}\,dx\Bigr)^{1/2}\Bigl(\int_Q^\infty x^{-2\Re\rho}\,dx\Bigr)^{1/2}
+\le E_Q^{1/2}\Bigl(\frac{Q^{1-2\Re\rho}}{2\Re\rho-1}\Bigr)^{1/2}.\qedhere
+\]
+\end{proof}
+
+\section{उपरि परिबंध और अंशांकन}\label{sec:cotas}
+
+\begin{teorema}\label{teo:theta}
+मान लीजिए $1/2\le\theta<1$। निम्नलिखित कथन तुल्य हैं:
+\begin{enumerate}
+\item $\Re s>\theta$ के लिए $\zeta(s)\ne0$;
+\item प्रत्येक $\varepsilon>0$ के लिए एक ऐसा $C$ विद्यमान है कि सभी $Q\ge2$ के लिए $E_Q\le CQ^{2\theta-1+\varepsilon}$;
+\item यही कथन $Q$ के मानों के किसी अपरिबद्ध अनुक्रम के लिए।
+\end{enumerate}
+\end{teorema}
+
+निहितार्थ (3)$\Rightarrow$(1) प्रमेय~\ref{teo:recip} से प्राप्त होता है। (1)$\Rightarrow$(2) के लिए प्रस्ताव~\ref{prop:mellin}(3) का उपयोग किया जाता है, और साथ में:
+\begin{itemize}
+\item परिबंध $|\zeta(\tfrac12+ix)|\ll(1+|x|)^{1/3}$, जो Hadamard की तीन-रेखा प्रमेय (three-lines theorem) से प्राप्त होता है;
+\item $\Re s\ge\theta+\delta$ में एक परिबंध $1/\zeta(s)\ll|t|^\eta$;
+\item Perron सूत्र से प्राप्त, Balazard--Saias प्रकार का, $1/\zeta(s)$ द्वारा $\sum_{d\le n}\mu(d)d^{-s}$ का एक एकसमान सन्निकटन, जो $|P_Q(\tfrac12+ix)|\ll Q^{\theta-1/2+\delta}(1+|x|)^\eta$ देता है।
+\end{itemize}
+
+\begin{teorema}[अंशांकन, बिना परिकल्पना के]\label{teo:calibracion}
+$\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1$.
+\end{teorema}
+
+\begin{corolario}
+RH $\iff E_Q\ll_\varepsilon Q^\varepsilon\iff$ एक ऐसा अनुक्रम $Q_j\to\infty$ विद्यमान है जिसके लिए $E_{Q_j}\ll_\varepsilon Q_j^\varepsilon$।
+\end{corolario}
+
+\section{तुल्य सूत्रीकरण और एक अवरोध}\label{sec:equiv}
+
+मान लीजिए $G(y)=\sum_{n\le y}\Lambda(n)(y/n-1)-y\log y+(1+\gamma)y$। औपचारिकीकरण में यह सिद्ध किया गया है कि RH निम्नलिखित में से प्रत्येक शर्त के तुल्य है:
+\begin{itemize}
+\item प्रत्येक $1/2<\theta<1$ के लिए, मनमाने ढंग से दूर स्थित अंतरालों $[Y,Y^{3/2}]$ में एकपक्षीय परिबंध $G(y)\le y^\theta$;
+\item चतुर्थ घातों पर मूल्यांकित, बड़े अभाज्यों पर परिभाषित एक न्यूनता (deficit) के लिए एक उप-बहुपदीय परिबंध;
+\item $\vartheta(t)-t$ के एक अतिपरवलयिक क्षेत्रकलन योग (hyperbolic quadrature sum) के लिए एक उप-बहुपदीय परिबंध।
+\end{itemize}
+इस अंतिम शर्त के लिए एक अवरोध प्रमेय भी सिद्ध किया गया है। प्रत्येक $\beta\in(1/2,1)$ के लिए, विक्षोभ $E(t)=-t^\beta$ निम्नलिखित गुणों को संतुष्ट करता है:
+\begin{itemize}
+\item $t+E(t)$ एकदिष्ट है;
+\item यह शास्त्रीय शून्य-मुक्त क्षेत्रों (de la Vallée Poussin, Vinogradov--Korobov) को पर्याप्त अंतर से संतुष्ट करता है;
+\item यह अतिपरवलयिक योग को $Y$ की एक घात की भाँति बढ़ाता है।
+\end{itemize}
+परिणामस्वरूप, ऐसा कोई भी तर्क जो केवल $\vartheta$ की एकदिष्टता और इन क्षेत्रों का उपयोग करता है, यह परिबंध सिद्ध नहीं कर सकता।
+
+\section{डिरिक्ले \texorpdfstring{$L$}{L}-फलन}\label{sec:dirichlet}
+
+मान लीजिए $\chi$ मापांक $N$ का एक अमुख्य लक्षण (non-principal character) है, $S_\chi(y)=\sum_{n\le y}\chi(n)$, $P_{Q,\chi}(s)=\sum_{d\le Q}\mu(d)\chi(d)d^{-s}$ और
+\[
+\sigma_{Q,\chi}(k)=1-\sum_{d\le Q}\mu(d)\chi(d)\,S_\chi(\lfloor k/d\rfloor),\qquad
+E_{Q,\chi}=\sum_{k\ge1}\frac{|\sigma_{Q,\chi}(k)|^2}{k(k+1)}.
+\]
+चूँकि $L(s,\chi)$ एक संपूर्ण (entire) फलन है, इसलिए संशोधकों की आवश्यकता नहीं है।
+
+\begin{teorema}\label{teo:dirichlet}
+\begin{enumerate}
+\item $1\le k\le Q$ के लिए $\sigma_{Q,\chi}(k)=0$, और $|\sigma_{Q,\chi}(k)|\le1+QN$।
+\item $\Re s>0$ के लिए:
+\[
+L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
+\int_1^\infty\sigma_{Q,\chi}(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-L(s,\chi)P_{Q,\chi}(s)}{s}.
+\]
+\item यदि $\Re\rho>1/2$ के साथ $L(\rho,\chi)=0$ हो, तो सभी $Q$ के लिए $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$।
+\item यदि $Q$ के किसी अपरिबद्ध अनुक्रम पर $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ हो, तो $\Re s>1/2$ में $L(s,\chi)\ne0$।
+\end{enumerate}
+\end{teorema}
+
+विलोम निहितार्थ ($\chi$ के लिए GRH $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$) के लिए खंड~\ref{sec:cotas} के परिबंधों के $L(s,\chi)$ हेतु अनुरूप परिबंधों की आवश्यकता है, और यह अभी शेष है। संख्यात्मक रूप से, मापांक $3$, $4$ और $5$ के लक्षणों तथा $Q\le1000$ के लिए, $E_{Q,\chi}$ का मान $0.06$ और $0.44$ के बीच रहता है।
+
+\section{औपचारिकीकरण और संयोजन}\label{sec:formal}
+
+संख्यात्मक कथनों को छोड़कर, उपर्युक्त सभी कथन Lean~4.33.1 में Mathlib (संशोधन \texttt{0df444a}) के साथ सिद्ध किए गए हैं:
+\begin{itemize}
+\item $\zeta$ के लिए 26 मॉड्यूल (लाइब्रेरी \texttt{AMateEnergia});
+\item डिरिक्ले $L$-फलनों के लिए एक मॉड्यूल (लाइब्रेरी \texttt{AMateDirichlet});
+\item Miller परीक्षण के बीजीय भाग वाला एक मॉड्यूल (लाइब्रेरी \texttt{AMateMiller})।
+\end{itemize}
+इनमें से किसी में भी \texttt{sorry} नहीं है, और \texttt{\#print axioms} केवल \texttt{propext}, \texttt{Classical.choice} और \texttt{Quot.sound} को सूचीबद्ध करता है। Lean के कर्नेल के अतिरिक्त, मुख्य प्रमेयों को स्वतंत्र सत्यापक \texttt{nanoda} ने भी स्वीकार किया (नीचे देखें)।
+
+\subsection*{Alp\"oge की लाइब्रेरी के साथ संयोजन}
+20 नवंबर 2026 को एक Lean लाइब्रेरी (175\,187 मॉड्यूल) की घोषणा की गई~\cite{Alpoge}, जो Mathlib के कथन के साथ \texttt{riemannHypothesis : RiemannHypothesis} को सिद्ध करती है, और साथ ही यह भी कि प्रत्येक डिरिक्ले लक्षण के लिए $\Re s>1/2$ में $L(s,\chi)$ शून्य नहीं होता। MIT ने कई स्वतंत्र कर्नेलों के साथ एक सत्यापन प्रकाशित किया~\cite{MIT}।
+\begin{itemize}
+\item \textbf{स्वतंत्र पुनरुत्पादन।} हमने लाइब्रेरी को स्रोतों से, MIT द्वारा प्रयुक्त पथ पर, अपनी एक आभासी मशीन (virtual machine) में संकलित किया। सभी 175\,187 \texttt{.olean} फ़ाइलें MIT की सूची से बाइट-दर-बाइट समान निकलीं, जिसमें वह एकमात्र मॉड्यूल भी शामिल है जिसे MIT अनियतात्मक (non-deterministic) के रूप में दर्ज करता है।
+\item \textbf{संयोजन।} संयोजन
+\[
+\texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon
+\]
+तीन मानक अभिगृहीतों के साथ एक ही परिवेश में संकलित होता है।
+\item \textbf{बिना परिकल्पना के उपप्रमेय।} इसी प्रकार Littlewood परिबंध $|M(n)|\le K_\delta n^{1/2+\delta}$ तथा प्रत्येक $\sigma>1/2$ के लिए $|G(y)|\le C_{\sigma}y^{\sigma}$ भी प्राप्त होते हैं (\path{AMate.mertens_raiz_alpoge} और \path{AMate.vonMangoldt_suavizada_alpoge}), ये भी केवल तीन मानक अभिगृहीतों के साथ।
+\item \textbf{स्थानीय संयोजन में प्रयुक्त बाइनरी फ़ाइलें।} हमने 175\,187 बाइनरी फ़ाइलों के एक तृतीय-पक्ष वितरण का उपयोग किया। इनमें से 76\,968 फ़ाइलें MIT की सूची से बाइट-दर-बाइट मेल खाती हैं। शेष 98\,219 ठीक वही हैं जिनमें उस वितरण का संकलन पथ (build path) अंकित है: समान फ़ाइलों में से किसी में भी यह पथ नहीं है, और सभी भिन्न फ़ाइलों में यह है।
+\item \textbf{एक स्वतंत्र कर्नेल द्वारा समीक्षा।} हमने \texttt{lean4export} से तीनों लाइब्रेरियों के मुख्य प्रमेयों के संवरण (closure) का निर्यात किया: Mathlib सहित 67\,319 घोषणाएँ। स्वतंत्र सत्यापक \texttt{nanoda} इन सभी को स्वीकार करता है, और निर्यात में केवल अभिगृहीत \texttt{propext}, \texttt{Quot.sound} और \texttt{Classical.choice} हैं। Alp\"oge वाले भाग (\texttt{riemannHypothesis}) की समीक्षा MIT ने कई स्वतंत्र कर्नेलों के साथ की~\cite{MIT}।
+\end{itemize}
+
+\subsection*{Miller परीक्षण}
+GRH के पहले परिणाम के रूप में हम Miller परीक्षण के बीजीय भाग का औपचारिकीकरण करते हैं (लाइब्रेरी \texttt{AMateMiller}):
+\begin{itemize}
+\item यदि $p$ अभाज्य है, तो मापांक $p$ की प्रत्येक इकाई एक प्रबल मिथ्यावादी (strong liar) है;
+\item यदि $n\ge3$ विषम और भाज्य है, तो प्रबल मिथ्यावादी $(\mathbb Z/n\mathbb Z)^\times$ के एक उचित उपसमूह में समाहित होते हैं।
+\end{itemize}
+परिणामस्वरूप, किसी भी ऐसे $B$ के लिए, जिसके लिए $(\mathbb Z/n\mathbb Z)^\times$ का प्रत्येक उचित उपसमूह किसी पूर्णांक $a\le B(n)$ द्वारा निरूपित कम से कम एक इकाई को छोड़ देता है, आधारों $a\le B(n)$ के साथ Miller परीक्षण सही है। Bach ने GRH मानकर सिद्ध किया कि $B(n)=2(\log n)^2$ मान्य है; इस परिबंध का औपचारिकीकरण ही वह शेष चरण है जिसके बाद एक सत्यापित नियतात्मक अभाज्यता परीक्षण उपलब्ध होगा।
+
+\begin{observacion}
+औपचारिक सत्यापन यह सुनिश्चित करता है कि Lean का कर्नेल प्रमाणों को स्वीकार करता है। यह Alp\"oge के प्रमाण की मानवीय गणितीय समीक्षा का स्थान नहीं लेता, जो सार्वजनिक जानकारी के अनुसार अभी पूरी नहीं हुई है। खंड 2--6 के परिणाम उस पर निर्भर नहीं करते।
+\end{observacion}
+
+\section{संबंधित कार्य और दायरा}
+
+यह मानदंड Nyman--Beurling--Báez-Duarte परिवार से संबंधित है। इस कार्य का अपना योगदान यह है:
+\begin{itemize}
+\item संशोधकों सहित साक्षी;
+\item घातांक का यथार्थ सूत्र (प्रमेय~\ref{teo:calibracion});
+\item तुल्य अंकगणितीय सूत्रीकरण;
+\item पूर्ण औपचारिकीकरण।
+\end{itemize}
+हमें इस प्रकार के मानदंडों के किसी पूर्ववर्ती औपचारिकीकरण की जानकारी नहीं है। Robin और Lagarias के मानदंड MIT के सत्यापन के साथ ही Lean में व्युत्पन्न किए जा चुके हैं~\cite{MIT}। साक्षी की गणितीय नवीनता को विशेषज्ञों द्वारा परखा जाना चाहिए।
+
+\begin{thebibliography}{99}
+\bibitem{Alpoge} L.~Alp\"oge, शीर्षकरहित घोषणा-टिप्पणी, \url{https://alpo.ge/remark.pdf}, 20 नवंबर 2026। इस टिप्पणी पर हस्ताक्षर नहीं हैं; लेखकत्व का निर्धारण डोमेन और~\cite{MIT} के आधार पर किया गया है।
+\bibitem{BaezDuarte} L.~B\'aez-Duarte, \emph{A strengthening of the Nyman--Beurling criterion for the Riemann hypothesis}, Atti Accad.\ Naz.\ Lincei Rend.\ Lincei Mat.\ Appl.\ 14 (2003), no.~1, 5--11. arXiv:math/0202141.
+\bibitem{BalazardSaias} M.~Balazard, E.~Saias, \emph{The Nyman--Beurling equivalent form for the Riemann hypothesis}, Expo.\ Math.\ 18 (2000), 131--138.
+\bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
+\bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), suppl.~2, S30--S36. arXiv:1211.5191.
+\bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), no.~1, 56--70. arXiv:math/0103058.
+\bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}, अभिगमन तिथि 23 नवंबर 2026।
+\bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, शोध-प्रबंध (thesis), Uppsala, 1950.
+\end{thebibliography}
+
+\end{document}

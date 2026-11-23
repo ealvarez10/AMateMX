@@ -1,0 +1,246 @@
+% 草稿。参考文献于 2026年11月23日核实。
+% 简体中文译本，译自 ../criterio_energia_amate.tex。
+\documentclass[11pt,a4paper]{amsart}
+
+% no-math：fontspec 不改动数学字体（否则摘要中的公式触发 "\textfont 6 is undefined"）。
+\PassOptionsToPackage{no-math}{fontspec}
+\usepackage{xeCJK}
+% 人名中的间隔号“·”按汉字处理，两侧不加西文间距。
+\xeCJKDeclareCharClass{CJK}{"00B7}
+\setCJKmainfont[BoldFont=FandolHei-Regular.otf,ItalicFont=FandolKai-Regular.otf,SmallCapsFont=FandolSong-Regular.otf]{FandolSong-Regular.otf}
+\setCJKsansfont{FandolHei-Regular.otf}
+\setCJKmonofont{FandolFang-Regular.otf}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\renewcommand{\abstractname}{摘要}
+\renewcommand{\refname}{参考文献}
+\renewcommand{\proofname}{证明}
+\renewcommand{\datename}{\textit{日期}：}
+% amsart 会在日期和 \thanks 注记之后自动添加句点；中文排版中不需要。
+\makeatletter
+\def\@setdate{\datename\@date}
+\def\@setthanks{\def\thanks##1{\par##1}\thankses}
+\makeatother
+
+\newtheorem{teorema}{定理}
+\newtheorem{proposicion}[teorema]{命题}
+\newtheorem{lema}[teorema]{引理}
+\newtheorem{corolario}[teorema]{推论}
+\theoremstyle{definition}
+\newtheorem{definicion}[teorema]{定义}
+\theoremstyle{remark}
+\newtheorem{observacion}[teorema]{注}
+
+\renewcommand{\Re}{\operatorname{Re}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+
+\title[黎曼猜想的一个能量判据]{黎曼猜想的一个能量判据、其校准及其在 Lean 中的形式化验证}
+\author{Ernesto \'Alvarez}
+\thanks{本工作是 Ernesto \'Alvarez 的 AMate 项目的一部分。Lean 库 \texttt{AMateEnergia}、\texttt{AMateDirichlet} 和 \texttt{AMateMiller} 均属于该项目。形式化证明与数值检验是在语言模型的协助下完成的。}
+\date{2026年11月23日（草稿）}
+
+\begin{document}
+
+\begin{abstract}
+我们定义一个显式的见证函数 $\sigma_Q$，它由默比乌斯函数、小数部分和两个校正项构造而成；并定义其能量 $E_Q=\sum_{k\ge1}\sigma_Q(k)^2/(k(k+1))$。我们无条件地证明
+\[
+  \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
+  \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
+\]
+特别地，黎曼猜想等价于 $E_Q\ll_\varepsilon Q^\varepsilon$，而 $\Re s>\theta$ 中无零点等价于 $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$。我们还给出了用涉及冯·曼戈尔特函数与素数的和式表述的若干等价形式，一个指出哪些方法无法证明其中某一形式的障碍定理，以及该判据向狄利克雷 $L$ 函数的推广。所有结果均已在 Lean~4 中借助 Mathlib 形式化，并且仅依赖三条标准公理。最后，我们将该判据与宣布给出黎曼猜想证明的 Lean 库（Alp\"oge，2026）进行组合；我们独立复现了该库的编译，其结果与 MIT 发布的验证逐字节一致。
+\end{abstract}
+
+\maketitle
+
+\section{引言}
+
+Nyman 与 Beurling 的判据~\cite{Nyman,Beurling} 把黎曼猜想（RH）表述为 $L^2(0,1)$ 中用小数部分函数的伸缩的线性组合进行逼近的问题。B\'aez-Duarte~\cite{BaezDuarte} 证明了只用自然数伸缩就已足够，而逼近速度与零点分布之间的联系也已得到研究~\cite{BalazardSaias,Burnol,BCF}。另一类性质不同的经典等价命题来自李特尔伍德：RH 等价于 $M(x)=\sum_{n\le x}\mu(n)\ll_\varepsilon x^{1/2+\varepsilon}$。
+
+本文在权为 $w_k=1/(k(k+1))$ 的序列空间中提出一个具体的见证函数，其能量\emph{度量}了零点的横坐标：$E_Q$ 的增长指数恰为 $2\Theta-1$。逼近型判据要求 $d_N\to0$；与之不同，这里的能量可以增长，而信息蕴含在增长速度之中。
+
+\subsection*{主要结果}
+\begin{itemize}
+\item 定理~\ref{teo:calibracion}：指数公式，无条件成立。
+\item 定理~\ref{teo:theta}：无零点半平面与能量的界之间的等价关系。
+\item 定理~\ref{teo:recip}：临界线外的零点所迫使的显式下界。
+\item 第~\ref{sec:equiv}~节：等价的算术表述与一个障碍定理。
+\item 第~\ref{sec:dirichlet}~节：向狄利克雷 $L(s,\chi)$ 函数的推广。
+\item 第~\ref{sec:formal}~节：Lean 中的形式化，以及与 Alp\"oge 库的组合。
+\end{itemize}
+
+\section{见证函数及其能量}
+
+\begin{definicion}
+对于 $Q\ge2$ 与 $k\ge1$，记 $u_d(k)=\{k/d\}$，并令 $m_Q=\sum_{d\le Q}\mu(d)/d$，$t_Q=1-\sum_{d\le Q}\mu(d)\log(Q/d)/d$，$\gamma_Q=Qt_Q/\log2$，$h_Q=2u_{2Q}-u_Q$。定义
+\[
+\varphi_Q=1+\sum_{d\le Q}\mu(d)\,u_d-Qm_Q\,u_Q,\qquad
+\sigma_Q=\varphi_Q-\gamma_Q h_Q,
+\]
+\[
+E_Q=\sum_{k\ge1}\sigma_Q(k)^2\,w_k,\qquad w_k=\frac1{k(k+1)}.
+\]
+\end{definicion}
+
+相应的狄利克雷多项式为
+\[
+P_Q(s)=\sum_{d\le Q}\mu(d)d^{-s}-Qm_QQ^{-s}-\gamma_Q\bigl(2(2Q)^{-s}-Q^{-s}\bigr).
+\]
+
+\begin{proposicion}\label{prop:mellin}
+\begin{enumerate}
+\item 当 $1\le k<Q$ 时 $\sigma_Q(k)=0$，并且 $E_Q\le 8(1+1/\log2)\,Q$。
+\item 当 $\Re s>0$ 且 $s\ne1$ 时，$\displaystyle\int_1^\infty\sigma_Q(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-\zeta(s)P_Q(s)}{s}$。
+\item $\displaystyle E_Q=\frac1{2\pi}\int_{\mathbb R}\frac{|1-\zeta(\tfrac12+ix)P_Q(\tfrac12+ix)|^2}{\tfrac14+x^2}\,dx$。
+\end{enumerate}
+\end{proposicion}
+
+$\zeta$ 在 $s=1$ 处的极点本会在 $\sigma_Q$ 中引入斜率，两个校正项恰好将其抵消；因此 (2) 中的梅林变换没有极点。
+
+\section{由零点导出的下界}
+
+\begin{teorema}\label{teo:recip}
+若 $\zeta(\rho)=0$ 且 $\Re\rho>1/2$，则对所有 $Q\ge2$ 有
+\[
+\frac{2\Re\rho-1}{|\rho|^2}\le E_Q\,Q^{1-2\Re\rho}.
+\]
+\end{teorema}
+
+\begin{proof}
+由命题~\ref{prop:mellin}，该积分在 $s=\rho$ 处等于 $1/\rho$；又因为当 $1<x<Q$ 时 $\sigma_Q(\lfloor x\rfloor)=0$，只有区间 $(Q,\infty)$ 有贡献。由柯西--施瓦茨不等式，
+\[
+\frac1{|\rho|}\le\Bigl(\int_Q^\infty\sigma_Q(\lfloor x\rfloor)^2x^{-2}\,dx\Bigr)^{1/2}\Bigl(\int_Q^\infty x^{-2\Re\rho}\,dx\Bigr)^{1/2}
+\le E_Q^{1/2}\Bigl(\frac{Q^{1-2\Re\rho}}{2\Re\rho-1}\Bigr)^{1/2}.\qedhere
+\]
+\end{proof}
+
+\section{上界与校准}\label{sec:cotas}
+
+\begin{teorema}\label{teo:theta}
+设 $1/2\le\theta<1$。以下三条等价：
+\begin{enumerate}
+\item 当 $\Re s>\theta$ 时 $\zeta(s)\ne0$；
+\item 对任意 $\varepsilon>0$，存在 $C$，使得对所有 $Q\ge2$ 有 $E_Q\le CQ^{2\theta-1+\varepsilon}$；
+\item 同样的结论在 $Q$ 取遍某个无界序列时成立。
+\end{enumerate}
+\end{teorema}
+
+蕴涵关系 (3)$\Rightarrow$(1) 由定理~\ref{teo:recip} 推出。对于 (1)$\Rightarrow$(2)，我们使用命题~\ref{prop:mellin}(3)，并结合：
+\begin{itemize}
+\item 由阿达马三线定理得到的界 $|\zeta(\tfrac12+ix)|\ll(1+|x|)^{1/3}$；
+\item 在 $\Re s\ge\theta+\delta$ 上的界 $1/\zeta(s)\ll|t|^\eta$；
+\item 借助佩龙公式得到的、用 $1/\zeta(s)$ 对 $\sum_{d\le n}\mu(d)d^{-s}$ 所作的 Balazard--Saias 型一致逼近，由此得到 $|P_Q(\tfrac12+ix)|\ll Q^{\theta-1/2+\delta}(1+|x|)^\eta$。
+\end{itemize}
+
+\begin{teorema}[校准，无条件]\label{teo:calibracion}
+$\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1$。
+\end{teorema}
+
+\begin{corolario}
+RH $\iff E_Q\ll_\varepsilon Q^\varepsilon\iff$ 存在序列 $Q_j\to\infty$，使得 $E_{Q_j}\ll_\varepsilon Q_j^\varepsilon$。
+\end{corolario}
+
+\section{等价表述与一个障碍}\label{sec:equiv}
+
+令 $G(y)=\sum_{n\le y}\Lambda(n)(y/n-1)-y\log y+(1+\gamma)y$。在形式化中我们证明了：RH 与下列每一个条件都等价。
+\begin{itemize}
+\item 对所有 $1/2<\theta<1$，单侧界 $G(y)\le y^\theta$ 在任意远处的窗口 $[Y,Y^{3/2}]$ 上成立；
+\item 大素数上的某个亏量（在四次幂处取值）满足次多项式界；
+\item $\vartheta(t)-t$ 的某个双曲求积和满足次多项式界。
+\end{itemize}
+对于最后一种表述，我们还证明了一个障碍定理。对每个 $\beta\in(1/2,1)$，扰动 $E(t)=-t^\beta$ 满足：
+\begin{itemize}
+\item $t+E(t)$ 是单调的；
+\item 它宽裕地满足经典的无零点区域（德拉瓦莱·普桑区域、维诺格拉多夫--科罗博夫区域）；
+\item 它使双曲和以 $Y$ 的幂次增长。
+\end{itemize}
+因此，任何仅利用 $\vartheta$ 的单调性和这些区域的论证都无法证明该界。
+
+\section{狄利克雷 \texorpdfstring{$L$}{L} 函数}\label{sec:dirichlet}
+
+设 $\chi$ 是模 $N$ 的非主特征，令 $S_\chi(y)=\sum_{n\le y}\chi(n)$，$P_{Q,\chi}(s)=\sum_{d\le Q}\mu(d)\chi(d)d^{-s}$，以及
+\[
+\sigma_{Q,\chi}(k)=1-\sum_{d\le Q}\mu(d)\chi(d)\,S_\chi(\lfloor k/d\rfloor),\qquad
+E_{Q,\chi}=\sum_{k\ge1}\frac{|\sigma_{Q,\chi}(k)|^2}{k(k+1)}.
+\]
+由于 $L(s,\chi)$ 是整函数，这里不需要校正项。
+
+\begin{teorema}\label{teo:dirichlet}
+\begin{enumerate}
+\item 当 $1\le k\le Q$ 时 $\sigma_{Q,\chi}(k)=0$，并且 $|\sigma_{Q,\chi}(k)|\le1+QN$。
+\item 当 $\Re s>0$ 时，
+\[
+L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
+\int_1^\infty\sigma_{Q,\chi}(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-L(s,\chi)P_{Q,\chi}(s)}{s}.
+\]
+\item 若 $L(\rho,\chi)=0$ 且 $\Re\rho>1/2$，则对所有 $Q$ 有 $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$。
+\item 若 $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ 沿 $Q$ 的某个无界序列成立，则在 $\Re s>1/2$ 中 $L(s,\chi)\ne0$。
+\end{enumerate}
+\end{teorema}
+
+逆向蕴涵（关于 $\chi$ 的 GRH $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$）需要第 \ref{sec:cotas} 节中各界对 $L(s,\chi)$ 的类比，目前尚未完成。数值上，对于模 $3$、$4$、$5$ 的特征以及 $Q\le1000$，$E_{Q,\chi}$ 始终介于 $0.06$ 与 $0.44$ 之间。
+
+\section{形式化与组合}\label{sec:formal}
+
+除数值结果外，上述所有命题均已在 Lean~4.33.1 中借助 Mathlib（修订版 \texttt{0df444a}）证明：
+\begin{itemize}
+\item 关于 $\zeta$ 的 26 个模块（库 \texttt{AMateEnergia}）；
+\item 关于狄利克雷 $L$ 函数的一个模块（库 \texttt{AMateDirichlet}）；
+\item 包含米勒检验代数部分的一个模块（库 \texttt{AMateMiller}）。
+\end{itemize}
+这些模块均不含 \texttt{sorry}，且 \texttt{\#print axioms} 只列出 \texttt{propext}、\texttt{Classical.choice} 和 \texttt{Quot.sound}。除 Lean 内核之外，主要定理还被独立验证器 \texttt{nanoda} 接受（见下文）。
+
+\subsection*{与 Alp\"oge 库的组合}
+2026年11月20日公布的一个 Lean 库~\cite{Alpoge}（共 175\,187 个模块）以 Mathlib 中的表述证明了 \texttt{riemannHypothesis : RiemannHypothesis}，并证明了对每个狄利克雷特征，$L(s,\chi)$ 在 $\Re s>1/2$ 中不为零。MIT 发布了一份使用多个独立内核完成的验证~\cite{MIT}。
+\begin{itemize}
+\item \emph{独立复现。}我们在自己的虚拟机上、在 MIT 所用的同一路径下，从源代码编译了该库。所得的 175\,187 个 \texttt{.olean} 文件与 MIT 的列表逐字节一致，其中包括 MIT 记录为非确定性的唯一模块。
+\item \emph{组合。}组合定理
+\[
+\texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon
+\]
+在单一环境中编译通过，且只依赖三条标准公理。
+\item \emph{无条件推论。}同理可得李特尔伍德界 $|M(n)|\le K_\delta n^{1/2+\delta}$，以及对所有 $\sigma>1/2$ 成立的 $|G(y)|\le C_{\sigma}y^{\sigma}$（\path{AMate.mertens_raiz_alpoge} 与 \path{AMate.vonMangoldt_suavizada_alpoge}），它们同样只依赖三条标准公理。
+\item \emph{本地组合所用的二进制文件。}我们使用了这 175\,187 个二进制文件的一个第三方发行版。其中 76\,968 个与 MIT 的列表逐字节一致；其余 98\,219 个恰好是包含该发行版编译路径的那些文件：一致的文件都不包含该路径，而不一致的文件全都包含。
+\item \emph{用独立内核复核。}我们用 \texttt{lean4export} 导出了三个库中主要定理的依赖闭包：共 67\,319 条声明，Mathlib 也包括在内。独立验证器 \texttt{nanoda} 接受了全部声明，且导出内容只包含公理 \texttt{propext}、\texttt{Quot.sound} 和 \texttt{Classical.choice}。Alp\"oge 的部分（\texttt{riemannHypothesis}）已由 MIT 用多个独立内核复核~\cite{MIT}。
+\end{itemize}
+
+\subsection*{米勒检验}
+作为 GRH 的第一个推论，我们形式化了米勒检验的代数部分（库 \texttt{AMateMiller}）：
+\begin{itemize}
+\item 若 $p$ 为素数，则模 $p$ 的每个单位都是强伪证（strong liar）；
+\item 若 $n\ge3$ 为奇合数，则全体强伪证包含在 $(\mathbb Z/n\mathbb Z)^\times$ 的某个真子群中。
+\end{itemize}
+因此，设 $B$ 满足：$(\mathbb Z/n\mathbb Z)^\times$ 的每个真子群都遗漏某个可由整数 $a\le B(n)$ 代表的单位；那么以 $a\le B(n)$ 为底的米勒检验是正确的。Bach 在假设 GRH 的前提下证明了 $B(n)=2(\log n)^2$ 满足这一条件；将这一界形式化，是得到一个经过验证的确定性素性检验所缺的那一步。
+
+\begin{observacion}
+形式化验证保证的是 Lean 内核接受这些证明。它不能取代对 Alp\"oge 证明的人工数学审查；据公开信息，这一审查尚未完成。第 2--6 节的结果不依赖于该证明。
+\end{observacion}
+
+\section{相关工作与适用范围}
+
+本文的判据属于 Nyman--Beurling--B\'aez-Duarte 判据族。本文特有的内容是：
+\begin{itemize}
+\item 带校正项的见证函数；
+\item 指数的精确公式（定理~\ref{teo:calibracion}）；
+\item 等价的算术表述；
+\item 完整的形式化。
+\end{itemize}
+据我们所知，此前尚无这类判据的形式化。Robin 判据和 Lagarias 判据已随 MIT 的验证在 Lean 中推导出来~\cite{MIT}。该见证函数在数学上的新颖性仍有待专家检验。
+
+\begin{thebibliography}{99}
+\bibitem{Alpoge} L.~Alp\"oge，无标题的公告说明，\url{https://alpo.ge/remark.pdf}，2026年11月20日。该说明未署名；作者归属依据其域名以及文献~\cite{MIT}。
+\bibitem{BaezDuarte} L.~B\'aez-Duarte, \emph{A strengthening of the Nyman--Beurling criterion for the Riemann hypothesis}, Atti Accad.\ Naz.\ Lincei Rend.\ Lincei Mat.\ Appl.\ 14 (2003), no.~1, 5--11. arXiv:math/0202141.
+\bibitem{BalazardSaias} M.~Balazard, E.~Saias, \emph{The Nyman--Beurling equivalent form for the Riemann hypothesis}, Expo.\ Math.\ 18 (2000), 131--138.
+\bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
+\bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), suppl.~2, S30--S36. arXiv:1211.5191.
+\bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), no.~1, 56--70. arXiv:math/0103058.
+\bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}，2026年11月23日访问。
+\bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, 学位论文, Uppsala, 1950.
+\end{thebibliography}
+
+\end{document}

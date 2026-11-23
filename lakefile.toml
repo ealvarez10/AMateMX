@@ -1,0 +1,37 @@
+name = "AMateEnergia"
+defaultTargets = ["AMateEnergia", "AMateDirichlet", "AMateMiller"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+# Same Mathlib revision as the Lean library announced by Alpöge, so that the
+# optional composition (AMateConAlpoge) needs no version reconciliation.
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "0df444a360eaa60ab8c11dca51a86af692955474"
+
+# Energy criterion for the Riemann hypothesis (26 modules, Mathlib only).
+[[lean_lib]]
+name = "AMateEnergia"
+
+# Extension of the criterion to Dirichlet L-functions (Mathlib only).
+[[lean_lib]]
+name = "AMateDirichlet"
+
+# Miller test: algebraic part and correctness given a Bach-type bound (Mathlib only).
+[[lean_lib]]
+name = "AMateMiller"
+
+# Optional composition with the Lean library announced by Alpöge (2026).
+# It needs that full library (175,187 modules) and its build cache, so it is
+# not built by default. To enable it, point `path` to your copy of that
+# library and uncomment both blocks. See README.md.
+#
+# [[require]]
+# name = "tree"
+# path = "../riemann-hypothesis/src/lean"
+#
+# [[lean_lib]]
+# name = "AMateConAlpoge"

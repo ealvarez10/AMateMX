@@ -1,0 +1,57 @@
+theorem AMate.tendsto_log_energia_div_log :
+  Filter.Tendsto
+    (fun (Q : Nat) =>
+    HDiv.hDiv (Real.log (HAdd.hAdd (OfNat.ofNat 2) (AMate.E Q))) (Real.log (Nat.cast Q)))
+    Filter.atTop (nhds (HSub.hSub (HMul.hMul (OfNat.ofNat 2) AMate.Theta_zeta) (OfNat.ofNat 1))) :=
+  _
+
+theorem AMate.rh_iff_energia_cofinal :
+  Iff RiemannHypothesis
+    (forall (ε : Real),
+    LT.lt (OfNat.ofNat 0) ε → Exists
+      (fun (C : Real) =>
+      forall (Q₀ : Nat),
+      Exists
+        (fun (Q : Nat) =>
+        And (LE.le Q₀ Q) (LE.le (AMate.E Q) (HMul.hMul C (HPow.hPow (Nat.cast Q) ε)))))) :=
+  _
+
+theorem AMate.energia_subpolinomial (hRH : RiemannHypothesis) (ε : Real)
+  (a._@._internal._hyg.0 : LT.lt (OfNat.ofNat 0) ε) :
+  Exists
+    (fun (C : Real) =>
+    forall (Q : Nat),
+    LE.le (OfNat.ofNat 2) Q → LE.le (AMate.E Q) (HMul.hMul C (HPow.hPow (Nat.cast Q) ε))) :=
+  _
+
+theorem AMate.Dirichlet.LFunction_ne_zero_de_energia_cofinal :
+  forall {N : Nat} [inst._@.AMateDirichlet.Testigo.2096853204._hygCtx._hyg.5 : NeZero N]
+    {χ : DirichletCharacter Complex N},
+  Ne χ (OfNat.ofNat 1) → (forall (ε : Real),
+    LT.lt (OfNat.ofNat 0) ε → Exists
+      (fun (C : Real) =>
+      forall (Q₀ : Nat),
+      Exists
+        (fun (Q : Nat) =>
+        And (LE.le Q₀ Q)
+          (LE.le (AMate.Dirichlet.E χ Q) (HMul.hMul C (HPow.hPow (Nat.cast Q) ε)))))) →
+  (forall (s : Complex),
+  LT.lt (HDiv.hDiv (OfNat.ofNat 1) (OfNat.ofNat 2)) (Complex.re s) → Ne
+    (DirichletCharacter.LFunction χ s) (OfNat.ofNat 0)) :=
+  _
+
+theorem AMate.Miller.test_miller_correcto :
+  forall {B : Nat → Nat},
+  AMate.Miller.CotaSubgruposPropios B → (forall {n : Nat},
+  LE.le (OfNat.ofNat 3) n → Odd n → Iff (Nat.Prime n)
+    (forall (a : Nat),
+    LE.le a (B n) → Nat.Coprime a n → AMate.Miller.MentirosoFuerte n (Nat.cast a))) :=
+  _
+
+axiom propext {a b : Prop} : Iff a b → Eq a b
+
+axiom Quot.sound.{u} {α : Sort u} {r : α → α → Prop} {a b : α} :
+  r a b → Eq (Quot.mk r a) (Quot.mk r b)
+
+axiom Classical.choice.{u} {α : Sort u} : Nonempty α → α
+

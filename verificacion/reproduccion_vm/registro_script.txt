@@ -1,0 +1,90 @@
+[2026-11-22 19:46:28 UTC] Máquina: 64 núcleos, 255 GB de RAM. Procesos de Lean a la vez: 64
+[2026-11-22 19:46:28 UTC] vm.max_map_count = 1048576
+[2026-11-22 19:46:48 UTC] Lean (version 4.33.1, x86_64-unknown-linux-gnu, commit 819816b2e0a3bf405af45ae5c7af2491d8f5bee6, Release)
+[2026-11-22 19:47:25 UTC] Biblioteca: commit 40e56bab026552e089d7afcfeff08d2defb9c005, 175187 módulos, huellas correctas
+21 archivos de AMate, huellas correctas
+info: mathlib: cloning https://github.com/leanprover-community/mathlib4
+info: mathlib: checking out revision '0df444a360eaa60ab8c11dca51a86af692955474'
+info: toolchain not updated; already up-to-date
+info: plausible: cloning https://github.com/leanprover-community/plausible
+info: plausible: checking out revision 'b7eb3304aeae834b12dda98993a37f6a41f6f0bb'
+info: LeanSearchClient: cloning https://github.com/leanprover-community/LeanSearchClient
+info: LeanSearchClient: checking out revision '5f4d51b81cbd3f6b32b156bfad9056621a040404'
+info: importGraph: cloning https://github.com/leanprover-community/import-graph
+info: importGraph: checking out revision '16f02aa7642864af59f1ff0e384a015994db9118'
+info: proofwidgets: cloning https://github.com/leanprover-community/ProofWidgets4
+info: proofwidgets: checking out revision '4be2e3d5087eeb272cf5a8853b8f9dd025ef5957'
+info: aesop: cloning https://github.com/leanprover-community/aesop
+info: aesop: checking out revision '3448c0bcc5ce01b2d1546e483ec3620e32df3d0e'
+info: Qq: cloning https://github.com/leanprover-community/quote4
+info: Qq: checking out revision '92c15be17b7caf78c2ad767ec40f89052d908d81'
+info: batteries: cloning https://github.com/leanprover-community/batteries
+info: batteries: checking out revision '4488d40d070b9700d4d5a6aa342f0d40c31b2a2d'
+info: Cli: cloning https://github.com/leanprover/lean4-cli
+info: Cli: checking out revision '6130a47896ce867c6a4a55373441e59e565bad0f'
+info: mathlib: running post-update hooks
+✔ [4/26] Built Cache.Cli (240ms)
+✔ [5/26] Built Cache.Lean (291ms)
+✔ [6/26] Built Cache.Cli:c.o (119ms)
+✔ [7/26] Built Cache.Lean:c.o (127ms)
+✔ [8/26] Built Cache.Infra (324ms)
+✔ [9/26] Built Cache.Infra:c.o (183ms)
+✔ [10/26] Built Batteries.Tactic.OpenPrivate (751ms)
+✔ [11/26] Built Cache.IO (1.2s)
+✔ [12/26] Built Batteries.Tactic.OpenPrivate:c.o (1.1s)
+✔ [13/26] Built Cache.Hashing (670ms)
+✔ [14/26] Built Cache.Hashing:c.o (393ms)
+✔ [15/26] Built Cache.IO:c.o (1.4s)
+✔ [16/26] Built Cache.Requests (1.7s)
+✔ [17/26] Built Cache.Marker (502ms)
+✔ [18/26] Built Cache.Marker:c.o (104ms)
+✔ [19/26] Built Cache.Query (587ms)
+✔ [20/26] Built Cache.Query:c.o (270ms)
+✔ [21/26] Built Cache.Warning (528ms)
+✔ [22/26] Built Cache.Warning:c.o (233ms)
+✔ [23/26] Built Cache.Main (1.0s)
+✔ [24/26] Built Cache.Requests:c.o (2.6s)
+✔ [25/26] Built Cache.Main:c.o (903ms)
+✔ [26/26] Built cache:exe (674ms)
+Current branch: HEAD
+Using cache from origin: (some leanprover-community/mathlib4)
+Attempting to download 8690 file(s) from leanprover-community/mathlib4 cache at https://lakecache.blob.core.windows.net/mathlib4-master
+Downloaded: 1 file(s) [attempted 1/8690 = 0%, 105 KB/s], Decompressed: 0[KDownloaded: 123 file(s) [attempted 123/8690 = 1%, 1981 KB/s], Decompressed: 3[KDownloaded: 290 file(s) [attempted 290/8690 = 3%, 5017 KB/s], Decompressed: 17[KDownloaded: 474 file(s) [attempted 474/8690 = 5%, 1003 KB/s], Decompressed: 17[KDownloaded: 659 file(s) [attempted 659/8690 = 7%, 1393 KB/s], Decompressed: 17[KDownloaded: 852 file(s) [attempted 852/8690 = 9%, 3031 KB/s], Decompressed: 17[KDownloaded: 1038 file(s) [attempted 1038/8690 = 11%, 769 KB/s], Decompressed: 17[KDownloaded: 1242 file(s) [attempted 1242/8690 = 14%, 637 KB/s], Decompressed: 17[KDownloaded: 1435 file(s) [attempted 1435/8690 = 16%, 607 KB/s], Decompressed: 17[KDownloaded: 1626 file(s) [attempted 1626/8690 = 18%, 997 KB/s], Decompressed: 197[KDownloaded: 1818 file(s) [attempted 1818/8690 = 20%, 155 KB/s], Decompressed: 197[KDownloaded: 2007 file(s) [attempted 2007/8690 = 23%, 1097 KB/s], Decompressed: 197[KDownloaded: 2191 file(s) [attempted 2191/8690 = 25%, 2037 KB/s], Decompressed: 197[KDownloaded: 2381 file(s) [attempted 2381/8690 = 27%, 1740 KB/s], Decompressed: 197[KDownloaded: 2561 file(s) [attempted 2561/8690 = 29%, 2620 KB/s], Decompressed: 197[KDownloaded: 2749 file(s) [attempted 2749/8690 = 31%, 2057 KB/s], Decompressed: 197[KDownloaded: 2933 file(s) [attempted 2933/8690 = 33%, 7785 KB/s], Decompressed: 197[KDownloaded: 3126 file(s) [attempted 3126/8690 = 35%, 1468 KB/s], Decompressed: 197[KDownloaded: 3314 file(s) [attempted 3314/8690 = 38%, 675 KB/s], Decompressed: 197[KDownloaded: 3507 file(s) [attempted 3507/8690 = 40%, 3374 KB/s], Decompressed: 197[KDownloaded: 3704 file(s) [attempted 3704/8690 = 42%, 3149 KB/s], Decompressed: 197[KDownloaded: 3899 file(s) [attempted 3899/8690 = 44%, 2059 KB/s], Decompressed: 197[KDownloaded: 4094 file(s) [attempted 4094/8690 = 47%, 1721 KB/s], Decompressed: 197[KDownloaded: 4283 file(s) [attempted 4283/8690 = 49%, 351 KB/s], Decompressed: 197[KDownloaded: 4467 file(s) [attempted 4467/8690 = 51%, 5530 KB/s], Decompressed: 197[KDownloaded: 4653 file(s) [attempted 4653/8690 = 53%, 1147 KB/s], Decompressed: 197[KDownloaded: 4843 file(s) [attempted 4843/8690 = 55%, 1676 KB/s], Decompressed: 197[KDownloaded: 5032 file(s) [attempted 5032/8690 = 57%, 2673 KB/s], Decompressed: 197[KDownloaded: 5213 file(s) [attempted 5213/8690 = 59%, 347 KB/s], Decompressed: 197[KDownloaded: 5389 file(s) [attempted 5389/8690 = 62%, 8918 KB/s], Decompressed: 197[KDownloaded: 5588 file(s) [attempted 5588/8690 = 64%, 845 KB/s], Decompressed: 197[KDownloaded: 5790 file(s) [attempted 5790/8690 = 66%, 724 KB/s], Decompressed: 197[KDownloaded: 5987 file(s) [attempted 5987/8690 = 68%, 618 KB/s], Decompressed: 197[KDownloaded: 6175 file(s) [attempted 6175/8690 = 71%, 3479 KB/s], Decompressed: 197[KDownloaded: 6363 file(s) [attempted 6363/8690 = 73%, 1843 KB/s], Decompressed: 197[KDownloaded: 6547 file(s) [attempted 6547/8690 = 75%, 1041 KB/s], Decompressed: 197[KDownloaded: 6745 file(s) [attempted 6745/8690 = 77%, 845 KB/s], Decompressed: 197[KDownloaded: 6933 file(s) [attempted 6933/8690 = 79%, 335 KB/s], Decompressed: 197[KDownloaded: 7110 file(s) [attempted 7110/8690 = 81%, 2089 KB/s], Decompressed: 197[KDownloaded: 7296 file(s) [attempted 7296/8690 = 83%, 723 KB/s], Decompressed: 197[KDownloaded: 7496 file(s) [attempted 7496/8690 = 86%, 197 KB/s], Decompressed: 197[KDownloaded: 7691 file(s) [attempted 7691/8690 = 88%, 3336 KB/s], Decompressed: 197[KDownloaded: 7881 file(s) [attempted 7881/8690 = 90%, 838 KB/s], Decompressed: 197[KDownloaded: 8063 file(s) [attempted 8063/8690 = 92%, 5587 KB/s], Decompressed: 197[KDownloaded: 8245 file(s) [attempted 8245/8690 = 94%, 762 KB/s], Decompressed: 197[KDownloaded: 8424 file(s) [attempted 8424/8690 = 96%, 481 KB/s], Decompressed: 197[KDownloaded: 8610 file(s) [attempted 8610/8690 = 99%, 4173 KB/s], Decompressed: 197[KDownloaded: 8690 file(s) [attempted 8690/8690 = 100%, 4173 KB/s], Decompressed: 197[K
+Decompressed 8690 file(s)
+Already decompressed 8690 file(s)
+Current branch: HEAD
+Using cache from origin: (some leanprover-community/mathlib4)
+No files to download
+Already decompressed 8690 file(s)
+✔ [8706/8723] Built AMateEnergia.Definiciones (4.5s)
+✔ [8707/8723] Built AMateEnergia.ZetaIntegral (6.0s)
+✔ [8708/8723] Built AMateEnergia.PerronPeso (6.8s)
+✔ [8709/8723] Built AMateEnergia.Plancherel (8.2s)
+✔ [8710/8723] Built AMateEnergia.Elementales (6.8s)
+✔ [8711/8723] Built AMateEnergia.ZetaCotas (6.7s)
+✔ [8712/8723] Built AMateEnergia.MellinTestigo (5.9s)
+✔ [8713/8723] Built AMateEnergia.ZetaRectaCero (6.5s)
+✔ [8714/8723] Built AMateEnergia.EnergiaFourier (5.3s)
+✔ [8715/8723] Built AMateEnergia.ZetaBanda (13s)
+✔ [8716/8723] Built AMateEnergia.InversaZeta (38s)
+✔ [8717/8723] Built AMateEnergia.PerronZ (5.8s)
+✔ [8718/8723] Built AMateEnergia.PerronContorno (16s)
+✔ [8719/8723] Built AMateEnergia.PolinomioCritica (8.2s)
+✔ [8720/8723] Built AMateEnergia.Analitica (3.7s)
+✔ [8721/8723] Built AMateEnergia.Teorema (11s)
+✔ [8722/8723] Built AMateEnergia (3.3s)
+Build completed successfully (8723 jobs).
+[2026-11-22 19:50:27 UTC] Parte de AMate compilada: 'AMate.energia_subpolinomial' depends on axioms: [propext, Classical.choice, Quot.sound] 
+[2026-11-22 19:50:27 UTC] Red cortada para constructor durante la compilación
+[2026-11-23 06:58:01 UTC] Pasada 1: compilación terminada
+[2026-11-23 06:58:52 UTC] Calculando las huellas de los .olean y comparando con el MIT
+Lista del MIT: descargada y verificada
+Ruta de compilación: /home/ubuntu/grh/src/lean
+Archivos compilados aquí: 175187
+Archivos que guardan la ruta de compilación: 98219 (en el MIT: 98219 de 175.187)
+Archivos en la lista del MIT: 175187
+Idénticos byte a byte: 175187
+Distintos: 0 (0 guardan la ruta de compilación, 0 no)
+En la lista del MIT pero no compilados aquí: 0
+Compilados aquí pero no en la lista del MIT: 0
+CONCLUSIÓN: todos idénticos
