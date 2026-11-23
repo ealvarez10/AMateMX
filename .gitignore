@@ -1,0 +1,5 @@
+.lake/
+/verificacion/nanoda/salida/
+*.olean
+*.ilean
+__pycache__/

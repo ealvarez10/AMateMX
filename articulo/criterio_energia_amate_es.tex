@@ -1,0 +1,230 @@
+% Borrador. Referencias verificadas el 23 de noviembre de 2026.
+\documentclass[11pt,a4paper]{amsart}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{teorema}{Teorema}
+\newtheorem{proposicion}[teorema]{Proposici\'on}
+\newtheorem{lema}[teorema]{Lema}
+\newtheorem{corolario}[teorema]{Corolario}
+\theoremstyle{definition}
+\newtheorem{definicion}[teorema]{Definici\'on}
+\theoremstyle{remark}
+\newtheorem{observacion}[teorema]{Observaci\'on}
+
+\renewcommand{\Re}{\operatorname{Re}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+
+\title[Un criterio de energ\'ia para la hip\'otesis de Riemann]{Un criterio de energ\'ia para la hip\'otesis de Riemann, su calibraci\'on y su verificaci\'on formal en Lean}
+\author{Ernesto \'Alvarez}
+\thanks{Este trabajo forma parte del proyecto AMate, de Ernesto \'Alvarez. Las bibliotecas de Lean \texttt{AMateEnergia}, \texttt{AMateDirichlet} y \texttt{AMateMiller} pertenecen a ese proyecto. Las demostraciones formales y las comprobaciones num\'ericas se desarrollaron con asistencia de modelos de lenguaje (Claude y Codex).}
+\date{23 de noviembre de 2026 (borrador)}
+
+\begin{document}
+
+\begin{abstract}
+Definimos un testigo expl\'icito $\sigma_Q$, construido con la funci\'on de M\"obius, partes fraccionarias y dos correctores, y su energ\'ia $E_Q=\sum_{k\ge1}\sigma_Q(k)^2/(k(k+1))$. Demostramos, sin hip\'otesis, que
+\[
+  \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
+  \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
+\]
+En particular, la hip\'otesis de Riemann equivale a $E_Q\ll_\varepsilon Q^\varepsilon$, y la ausencia de ceros en $\Re s>\theta$ equivale a $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. Damos tambi\'en formulaciones equivalentes en t\'erminos de sumas de von Mangoldt y de primos, un teorema de barrera que delimita qu\'e m\'etodos no pueden cerrar una de ellas, y una extensi\'on del criterio a funciones $L$ de Dirichlet. Todos los resultados est\'an formalizados en Lean~4 con Mathlib y dependen solo de los tres axiomas est\'andar. Finalmente componemos el criterio con la biblioteca de Lean que anuncia una demostraci\'on de la hip\'otesis de Riemann (Alp\"oge, 2026), cuya compilaci\'on reproducimos de forma independiente, byte a byte, frente a la verificaci\'on publicada por el MIT.
+\end{abstract}
+
+\maketitle
+
+\section{Introducci\'on}
+
+El criterio de Nyman y Beurling~\cite{Nyman,Beurling} expresa la hip\'otesis de Riemann (HR) como un problema de aproximaci\'on en $L^2(0,1)$ por combinaciones de dilataciones de la parte fraccionaria. B\'aez-Duarte~\cite{BaezDuarte} mostr\'o que basta con dilataciones naturales, y la velocidad de aproximaci\'on se ha relacionado con la distribuci\'on de los ceros~\cite{BalazardSaias,Burnol,BCF}. Una equivalencia cl\'asica de otra naturaleza es la de Littlewood: HR equivale a $M(x)=\sum_{n\le x}\mu(n)\ll_\varepsilon x^{1/2+\varepsilon}$.
+
+Este trabajo propone un testigo concreto, en el espacio de sucesiones con pesos $w_k=1/(k(k+1))$, cuya energ\'ia \emph{mide} la abscisa de los ceros: el exponente de crecimiento de $E_Q$ es exactamente $2\Theta-1$. A diferencia de los criterios de aproximaci\'on, que piden $d_N\to0$, aqu\'i la energ\'ia puede crecer, y la informaci\'on est\'a en la velocidad.
+
+\subsection*{Resultados}
+\begin{itemize}
+\item Teorema~\ref{teo:calibracion}: la f\'ormula del exponente, sin hip\'otesis.
+\item Teorema~\ref{teo:theta}: la equivalencia entre semiplanos libres de ceros y cotas de la energ\'ia.
+\item Teorema~\ref{teo:recip}: la cota inferior expl\'icita que impone un cero fuera de la recta cr\'itica.
+\item Secci\'on~\ref{sec:equiv}: formulaciones aritm\'eticas equivalentes y un teorema de barrera.
+\item Secci\'on~\ref{sec:dirichlet}: la extensi\'on a funciones $L(s,\chi)$ de Dirichlet.
+\item Secci\'on~\ref{sec:formal}: la formalizaci\'on en Lean y la composici\'on con la biblioteca de Alp\"oge.
+\end{itemize}
+
+\section{El testigo y su energ\'ia}
+
+\begin{definicion}
+Para $Q\ge2$ y $k\ge1$ sean $u_d(k)=\{k/d\}$, $m_Q=\sum_{d\le Q}\mu(d)/d$, $t_Q=1-\sum_{d\le Q}\mu(d)\log(Q/d)/d$, $\gamma_Q=Qt_Q/\log2$ y $h_Q=2u_{2Q}-u_Q$. Definimos
+\[
+\varphi_Q=1+\sum_{d\le Q}\mu(d)\,u_d-Qm_Q\,u_Q,\qquad
+\sigma_Q=\varphi_Q-\gamma_Q h_Q,
+\]
+\[
+E_Q=\sum_{k\ge1}\sigma_Q(k)^2\,w_k,\qquad w_k=\frac1{k(k+1)}.
+\]
+\end{definicion}
+
+El polinomio de Dirichlet asociado es
+\[
+P_Q(s)=\sum_{d\le Q}\mu(d)d^{-s}-Qm_QQ^{-s}-\gamma_Q\bigl(2(2Q)^{-s}-Q^{-s}\bigr).
+\]
+
+\begin{proposicion}\label{prop:mellin}
+\begin{enumerate}
+\item $\sigma_Q(k)=0$ para $1\le k<Q$, y $E_Q\le 8(1+1/\log2)\,Q$.
+\item Para $\Re s>0$, $s\ne1$: $\displaystyle\int_1^\infty\sigma_Q(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-\zeta(s)P_Q(s)}{s}$.
+\item $\displaystyle E_Q=\frac1{2\pi}\int_{\mathbb R}\frac{|1-\zeta(\tfrac12+ix)P_Q(\tfrac12+ix)|^2}{\tfrac14+x^2}\,dx$.
+\end{enumerate}
+\end{proposicion}
+
+Los dos correctores anulan las pendientes que el polo de $\zeta$ en $s=1$ introducir\'ia en $\sigma_Q$; por eso la transformada de Mellin de~(2) no tiene polo.
+
+\section{Cota inferior por un cero}
+
+\begin{teorema}\label{teo:recip}
+Si $\zeta(\rho)=0$ con $\Re\rho>1/2$, entonces para todo $Q\ge2$
+\[
+\frac{2\Re\rho-1}{|\rho|^2}\le E_Q\,Q^{1-2\Re\rho}.
+\]
+\end{teorema}
+
+\begin{proof}
+Por la Proposici\'on~\ref{prop:mellin}, en $s=\rho$ la integral vale $1/\rho$, y como $\sigma_Q(\lfloor x\rfloor)=0$ para $1<x<Q$ solo contribuye $(Q,\infty)$. Por Cauchy--Schwarz,
+\[
+\frac1{|\rho|}\le\Bigl(\int_Q^\infty\sigma_Q(\lfloor x\rfloor)^2x^{-2}\,dx\Bigr)^{1/2}\Bigl(\int_Q^\infty x^{-2\Re\rho}\,dx\Bigr)^{1/2}
+\le E_Q^{1/2}\Bigl(\frac{Q^{1-2\Re\rho}}{2\Re\rho-1}\Bigr)^{1/2}.\qedhere
+\]
+\end{proof}
+
+\section{Cota superior y calibraci\'on}\label{sec:cotas}
+
+\begin{teorema}\label{teo:theta}
+Sea $1/2\le\theta<1$. Son equivalentes:
+\begin{enumerate}
+\item $\zeta(s)\ne0$ para $\Re s>\theta$;
+\item para todo $\varepsilon>0$ existe $C$ con $E_Q\le CQ^{2\theta-1+\varepsilon}$ para todo $Q\ge2$;
+\item lo mismo para una sucesi\'on no acotada de valores de $Q$.
+\end{enumerate}
+\end{teorema}
+
+La implicaci\'on (3)$\Rightarrow$(1) se sigue del Teorema~\ref{teo:recip}. Para (1)$\Rightarrow$(2) se usa la Proposici\'on~\ref{prop:mellin}(3), junto con:
+\begin{itemize}
+\item la cota $|\zeta(\tfrac12+ix)|\ll(1+|x|)^{1/3}$, obtenida con tres rectas de Hadamard;
+\item una cota $1/\zeta(s)\ll|t|^\eta$ en $\Re s\ge\theta+\delta$;
+\item una aproximaci\'on uniforme, de tipo Balazard--Saias, de $\sum_{d\le n}\mu(d)d^{-s}$ por $1/\zeta(s)$, obtenida con la f\'ormula de Perron, que da $|P_Q(\tfrac12+ix)|\ll Q^{\theta-1/2+\delta}(1+|x|)^\eta$.
+\end{itemize}
+
+\begin{teorema}[Calibraci\'on, sin hip\'otesis]\label{teo:calibracion}
+$\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1$.
+\end{teorema}
+
+\begin{corolario}
+HR $\iff E_Q\ll_\varepsilon Q^\varepsilon\iff$ existe una sucesi\'on $Q_j\to\infty$ con $E_{Q_j}\ll_\varepsilon Q_j^\varepsilon$.
+\end{corolario}
+
+\section{Formulaciones equivalentes y una barrera}\label{sec:equiv}
+
+Sea $G(y)=\sum_{n\le y}\Lambda(n)(y/n-1)-y\log y+(1+\gamma)y$. En la formalizaci\'on se demuestra que HR equivale a cada una de las siguientes condiciones:
+\begin{itemize}
+\item la cota unilateral $G(y)\le y^\theta$ en ventanas $[Y,Y^{3/2}]$ arbitrariamente lejanas, para todo $1/2<\theta<1$;
+\item una cota subpolinomial para un d\'eficit sobre primos grandes evaluado en cuartas potencias;
+\item una cota subpolinomial para una suma de cuadratura hiperb\'olica de $\vartheta(t)-t$.
+\end{itemize}
+Para esta \'ultima se prueba adem\'as un teorema de barrera. Para cada $\beta\in(1/2,1)$, la perturbaci\'on $E(t)=-t^\beta$ cumple:
+\begin{itemize}
+\item $t+E(t)$ es mon\'otona;
+\item satisface con margen las regiones libres de ceros cl\'asicas (de la Vall\'ee Poussin, Vinogradov--Korobov);
+\item hace crecer la suma hiperb\'olica como una potencia de $Y$.
+\end{itemize}
+En consecuencia, ning\'un argumento que use solo la monoton\'ia de $\vartheta$ y esas regiones puede demostrar la cota.
+
+\section{Funciones $L$ de Dirichlet}\label{sec:dirichlet}
+
+Sea $\chi$ un car\'acter no principal m\'odulo $N$, $S_\chi(y)=\sum_{n\le y}\chi(n)$, $P_{Q,\chi}(s)=\sum_{d\le Q}\mu(d)\chi(d)d^{-s}$ y
+\[
+\sigma_{Q,\chi}(k)=1-\sum_{d\le Q}\mu(d)\chi(d)\,S_\chi(\lfloor k/d\rfloor),\qquad
+E_{Q,\chi}=\sum_{k\ge1}\frac{|\sigma_{Q,\chi}(k)|^2}{k(k+1)}.
+\]
+Como $L(s,\chi)$ es entera, no hacen falta correctores.
+
+\begin{teorema}\label{teo:dirichlet}
+\begin{enumerate}
+\item $\sigma_{Q,\chi}(k)=0$ para $1\le k\le Q$ y $|\sigma_{Q,\chi}(k)|\le1+QN$.
+\item Para $\Re s>0$:
+\[
+L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
+\int_1^\infty\sigma_{Q,\chi}(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-L(s,\chi)P_{Q,\chi}(s)}{s}.
+\]
+\item Si $L(\rho,\chi)=0$ con $\Re\rho>1/2$, entonces $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$ para todo $Q$.
+\item Si $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ en una sucesi\'on no acotada de $Q$, entonces $L(s,\chi)\ne0$ en $\Re s>1/2$.
+\end{enumerate}
+\end{teorema}
+
+La implicaci\'on rec\'iproca (GRH para $\chi$ $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$) requiere los an\'alogos para $L(s,\chi)$ de las cotas de la Secci\'on~\ref{sec:cotas} y queda pendiente. Num\'ericamente, para caracteres m\'odulo $3$, $4$ y $5$ y $Q\le1000$, $E_{Q,\chi}$ se mantiene entre $0{,}06$ y $0{,}44$.
+
+\section{Formalizaci\'on y composici\'on}\label{sec:formal}
+
+Todos los enunciados anteriores, salvo los num\'ericos, est\'an demostrados en Lean~4.33.1 con Mathlib (revisi\'on \texttt{0df444a}):
+\begin{itemize}
+\item 26 m\'odulos para $\zeta$ (biblioteca \texttt{AMateEnergia});
+\item un m\'odulo para funciones $L$ de Dirichlet (biblioteca \texttt{AMateDirichlet});
+\item un m\'odulo con la parte algebraica del test de Miller (biblioteca \texttt{AMateMiller}).
+\end{itemize}
+Ninguno contiene \texttt{sorry}, y \texttt{\#print axioms} lista solo \texttt{propext}, \texttt{Classical.choice} y \texttt{Quot.sound}. Adem\'as de por el n\'ucleo de Lean, los teoremas principales fueron aceptados por el verificador independiente \texttt{nanoda} (ver abajo).
+
+\subsection*{Composici\'on con la biblioteca de Alp\"oge}
+El 20 de noviembre de 2026 se anunci\'o~\cite{Alpoge} una biblioteca de Lean (175\,187 m\'odulos) que demuestra \texttt{riemannHypothesis : RiemannHypothesis}, con el enunciado de Mathlib, y la no anulaci\'on de $L(s,\chi)$ en $\Re s>1/2$ para todo car\'acter de Dirichlet. El MIT public\'o una verificaci\'on con varios n\'ucleos independientes~\cite{MIT}.
+\begin{itemize}
+\item \emph{Reproducci\'on independiente.} Compilamos la biblioteca desde las fuentes, en la ruta usada por el MIT, en una m\'aquina virtual propia. Los 175\,187 archivos \texttt{.olean} resultaron id\'enticos byte a byte a la lista del MIT, incluido el \'unico m\'odulo que el MIT documenta como no determinista.
+\item \emph{Composici\'on.} La composici\'on
+\[
+\texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon
+\]
+compila en un solo entorno con los tres axiomas est\'andar.
+\item \emph{Corolarios sin hip\'otesis.} De igual modo se obtienen la cota de Littlewood $|M(n)|\le K_\delta n^{1/2+\delta}$ y $|G(y)|\le C_{\sigma}y^{\sigma}$ para todo $\sigma>1/2$ (\path{AMate.mertens_raiz_alpoge} y \path{AMate.vonMangoldt_suavizada_alpoge}), tambi\'en con solo los tres axiomas est\'andar.
+\item \emph{Binarios usados en la composici\'on local.} Usamos una distribuci\'on de terceros de los 175\,187 binarios. De ellos, 76\,968 coinciden byte a byte con la lista del MIT. Los 98\,219 restantes son exactamente los que contienen la ruta de compilaci\'on de esa distribuci\'on: ninguno de los id\'enticos la contiene y todos los distintos s\'i.
+\item \emph{Revisi\'on con un n\'ucleo independiente.} Exportamos con \texttt{lean4export} el cierre de los teoremas principales de las tres bibliotecas: 67\,319 declaraciones, Mathlib incluida. El verificador independiente \texttt{nanoda} las acepta todas, y la exportaci\'on solo contiene los axiomas \texttt{propext}, \texttt{Quot.sound} y \texttt{Classical.choice}. La parte de Alp\"oge (\texttt{riemannHypothesis}) fue revisada por el MIT con varios n\'ucleos independientes~\cite{MIT}.
+\end{itemize}
+
+\subsection*{Test de Miller}
+Como primera consecuencia de GRH formalizamos la parte algebraica del test de Miller (biblioteca \texttt{AMateMiller}):
+\begin{itemize}
+\item si $p$ es primo, toda unidad m\'odulo $p$ es mentirosa fuerte;
+\item si $n\ge3$ es impar y compuesto, los mentirosos fuertes est\'an contenidos en un subgrupo propio de $(\mathbb Z/n\mathbb Z)^\times$.
+\end{itemize}
+En consecuencia, para cualquier $B$ tal que todo subgrupo propio de $(\mathbb Z/n\mathbb Z)^\times$ omita una unidad representada por un entero $a\le B(n)$, el test de Miller con las bases $a\le B(n)$ es correcto. Bach demostr\'o, suponiendo GRH, que vale $B(n)=2(\log n)^2$; formalizar esa cota es el paso que falta para tener un test de primalidad determinista verificado.
+
+\begin{observacion}
+La verificaci\'on formal garantiza que el n\'ucleo de Lean acepta las demostraciones. No sustituye la revisi\'on matem\'atica humana de la demostraci\'on de Alp\"oge, que seg\'un la informaci\'on p\'ublica no ha concluido. Los resultados de las secciones 2--6 no dependen de ella.
+\end{observacion}
+
+\section{Trabajo relacionado y alcance}
+
+El criterio pertenece a la familia de Nyman--Beurling--B\'aez-Duarte. Lo propio de este trabajo es:
+\begin{itemize}
+\item el testigo con correctores;
+\item la f\'ormula exacta del exponente (Teorema~\ref{teo:calibracion});
+\item las formulaciones aritm\'eticas equivalentes;
+\item la formalizaci\'on completa.
+\end{itemize}
+No conocemos formalizaciones previas de criterios de este tipo. Robin y Lagarias ya fueron derivados en Lean junto a la verificaci\'on del MIT~\cite{MIT}. La novedad matem\'atica del testigo debe ser contrastada por especialistas.
+
+\begin{thebibliography}{99}
+\bibitem{Alpoge} L.~Alp\"oge, nota de anuncio sin t\'itulo, \url{https://alpo.ge/remark.pdf}, 20 de noviembre de 2026. La nota no lleva firma; la atribuci\'on procede del dominio y de~\cite{MIT}.
+\bibitem{BaezDuarte} L.~B\'aez-Duarte, \emph{A strengthening of the Nyman--Beurling criterion for the Riemann hypothesis}, Atti Accad.\ Naz.\ Lincei Rend.\ Lincei Mat.\ Appl.\ 14 (2003), n\'um.~1, 5--11. arXiv:math/0202141.
+\bibitem{BalazardSaias} M.~Balazard, E.~Saias, \emph{The Nyman--Beurling equivalent form for the Riemann hypothesis}, Expo.\ Math.\ 18 (2000), 131--138.
+\bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
+\bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), supl.~2, S30--S36. arXiv:1211.5191.
+\bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), n\'um.~1, 56--70. arXiv:math/0103058.
+\bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}, consultado el 23 de noviembre de 2026.
+\bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, tesis, Uppsala, 1950.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,3 @@
+AMate.energia_subpolinomial_alpoge : ∀ (ε : ℝ), 0 < ε → ∃ C, ∀ (Q : ℕ), 2 ≤ Q → AMate.E Q ≤ C * ↑Q ^ ε
+'AMate.energia_subpolinomial_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'riemannHypothesis' depends on axioms: [propext, Classical.choice, Quot.sound]

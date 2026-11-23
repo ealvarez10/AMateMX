@@ -1,0 +1,229 @@
+\documentclass[11pt,a4paper]{amsart}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\renewcommand{\Re}{\operatorname{Re}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+
+\title[An energy criterion for the Riemann hypothesis]{An energy criterion for the Riemann hypothesis, its calibration and its formal verification in Lean}
+\author{Ernesto \'Alvarez}
+\thanks{This work is part of the AMate project, by Ernesto \'Alvarez. The Lean libraries \texttt{AMateEnergia}, \texttt{AMateDirichlet} and \texttt{AMateMiller} belong to that project. The formal proofs and the numerical checks were developed with the assistance of language models (Claude and Codex).}
+\date{23 November 2026}
+
+\begin{document}
+
+\begin{abstract}
+We define an explicit witness $\sigma_Q$, built from the M\"obius function, fractional parts and two correction terms, and its energy $E_Q=\sum_{k\ge1}\sigma_Q(k)^2/(k(k+1))$. We prove, unconditionally, that
+\[
+  \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
+  \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
+\]
+In particular, the Riemann hypothesis is equivalent to $E_Q\ll_\varepsilon Q^\varepsilon$, and the absence of zeros in $\Re s>\theta$ is equivalent to $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. We also give equivalent formulations in terms of von Mangoldt sums and sums over primes, a barrier theorem that delimits which methods cannot establish one of them, and an extension of one direction of the criterion to Dirichlet $L$-functions. All the stated theorems are formalized in Lean~4 with Mathlib, depend only on the three standard axioms, and were rechecked by the independent kernel \texttt{nanoda}. Finally, we compose the criterion with the Lean library that announces a proof of the Riemann hypothesis (Alp\"oge, 2026), which has been machine-checked but not yet peer reviewed; we reproduce its compilation independently, byte for byte, against the verification published by MIT.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+The Nyman--Beurling criterion~\cite{Nyman,Beurling} expresses the Riemann hypothesis (RH) as a problem of approximation in $L^2(0,1)$ by combinations of dilations of the fractional part. B\'aez-Duarte~\cite{BaezDuarte} showed that dilations by natural numbers suffice, and the rate of approximation has been related to the distribution of the zeros~\cite{BalazardSaias,Burnol,BCF}. A classical equivalence of a different nature is Littlewood's: RH is equivalent to $M(x)=\sum_{n\le x}\mu(n)\ll_\varepsilon x^{1/2+\varepsilon}$.
+
+This paper proposes a concrete witness, in the space of sequences with weights $w_k=1/(k(k+1))$, whose energy \emph{measures} the abscissa of the zeros: the growth exponent of $E_Q$ is exactly $2\Theta-1$. Unlike approximation criteria, which require $d_N\to0$, here the energy may grow, and the information lies in its rate of growth.
+
+\subsection*{Results}
+\begin{itemize}
+\item Theorem~\ref{teo:calibracion}: the formula for the exponent, unconditionally.
+\item Theorem~\ref{teo:theta}: the equivalence between zero-free half-planes and bounds for the energy.
+\item Theorem~\ref{teo:recip}: the explicit lower bound forced by a zero off the critical line.
+\item Section~\ref{sec:equiv}: equivalent arithmetic formulations and a barrier theorem.
+\item Section~\ref{sec:dirichlet}: the extension to Dirichlet $L$-functions $L(s,\chi)$.
+\item Section~\ref{sec:formal}: the formalization in Lean and the composition with Alp\"oge's library.
+\end{itemize}
+
+\section{The witness and its energy}
+
+\begin{definition}
+For $Q\ge2$ and $k\ge1$ let $u_d(k)=\{k/d\}$, $m_Q=\sum_{d\le Q}\mu(d)/d$, $t_Q=1-\sum_{d\le Q}\mu(d)\log(Q/d)/d$, $\gamma_Q=Qt_Q/\log2$ and $h_Q=2u_{2Q}-u_Q$. We define
+\[
+\varphi_Q=1+\sum_{d\le Q}\mu(d)\,u_d-Qm_Q\,u_Q,\qquad
+\sigma_Q=\varphi_Q-\gamma_Q h_Q,
+\]
+\[
+E_Q=\sum_{k\ge1}\sigma_Q(k)^2\,w_k,\qquad w_k=\frac1{k(k+1)}.
+\]
+\end{definition}
+
+The associated Dirichlet polynomial is
+\[
+P_Q(s)=\sum_{d\le Q}\mu(d)d^{-s}-Qm_QQ^{-s}-\gamma_Q\bigl(2(2Q)^{-s}-Q^{-s}\bigr).
+\]
+
+\begin{proposition}\label{prop:mellin}
+\begin{enumerate}
+\item $\sigma_Q(k)=0$ for $1\le k<Q$, and $E_Q\le 8(1+1/\log2)\,Q$.
+\item For $\Re s>0$, $s\ne1$: $\displaystyle\int_1^\infty\sigma_Q(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-\zeta(s)P_Q(s)}{s}$.
+\item $\displaystyle E_Q=\frac1{2\pi}\int_{\mathbb R}\frac{|1-\zeta(\tfrac12+ix)P_Q(\tfrac12+ix)|^2}{\tfrac14+x^2}\,dx$.
+\end{enumerate}
+\end{proposition}
+
+The two correction terms cancel the slopes that the pole of $\zeta$ at $s=1$ would introduce into $\sigma_Q$; this is why the Mellin transform in~(2) has no pole.
+
+\section{A lower bound from a zero}
+
+\begin{theorem}\label{teo:recip}
+If $\zeta(\rho)=0$ with $\Re\rho>1/2$, then for every $Q\ge2$
+\[
+\frac{2\Re\rho-1}{|\rho|^2}\le E_Q\,Q^{1-2\Re\rho}.
+\]
+\end{theorem}
+
+\begin{proof}
+By Proposition~\ref{prop:mellin}, at $s=\rho$ the integral equals $1/\rho$, and since $\sigma_Q(\lfloor x\rfloor)=0$ for $1<x<Q$, only $(Q,\infty)$ contributes. By Cauchy--Schwarz,
+\[
+\frac1{|\rho|}\le\Bigl(\int_Q^\infty\sigma_Q(\lfloor x\rfloor)^2x^{-2}\,dx\Bigr)^{1/2}\Bigl(\int_Q^\infty x^{-2\Re\rho}\,dx\Bigr)^{1/2}
+\le E_Q^{1/2}\Bigl(\frac{Q^{1-2\Re\rho}}{2\Re\rho-1}\Bigr)^{1/2}.\qedhere
+\]
+\end{proof}
+
+\section{Upper bound and calibration}\label{sec:cotas}
+
+\begin{theorem}\label{teo:theta}
+Let $1/2\le\theta<1$. The following are equivalent:
+\begin{enumerate}
+\item $\zeta(s)\ne0$ for $\Re s>\theta$;
+\item for every $\varepsilon>0$ there exists $C$ with $E_Q\le CQ^{2\theta-1+\varepsilon}$ for all $Q\ge2$;
+\item the same for an unbounded sequence of values of $Q$.
+\end{enumerate}
+\end{theorem}
+
+The implication (3)$\Rightarrow$(1) follows from Theorem~\ref{teo:recip}. For (1)$\Rightarrow$(2) one uses Proposition~\ref{prop:mellin}(3), together with:
+\begin{itemize}
+\item the bound $|\zeta(\tfrac12+ix)|\ll(1+|x|)^{1/3}$, obtained from Hadamard's three-lines theorem;
+\item a bound $1/\zeta(s)\ll|t|^\eta$ in $\Re s\ge\theta+\delta$;
+\item a uniform approximation, of Balazard--Saias type, of $\sum_{d\le n}\mu(d)d^{-s}$ by $1/\zeta(s)$, obtained from Perron's formula, which gives $|P_Q(\tfrac12+ix)|\ll Q^{\theta-1/2+\delta}(1+|x|)^\eta$.
+\end{itemize}
+
+\begin{theorem}[Calibration, unconditional]\label{teo:calibracion}
+$\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1$.
+\end{theorem}
+
+\begin{corollary}
+RH $\iff E_Q\ll_\varepsilon Q^\varepsilon\iff$ there exists a sequence $Q_j\to\infty$ with $E_{Q_j}\ll_\varepsilon Q_j^\varepsilon$.
+\end{corollary}
+
+\section{Equivalent formulations and a barrier}\label{sec:equiv}
+
+Let $G(y)=\sum_{n\le y}\Lambda(n)(y/n-1)-y\log y+(1+\gamma)y$. In the formalization it is proved that RH is equivalent to each of the following conditions:
+\begin{itemize}
+\item the one-sided bound $G(y)\le y^\theta$ on arbitrarily distant windows $[Y,Y^{3/2}]$, for every $1/2<\theta<1$;
+\item a subpolynomial bound for a deficit over large primes evaluated at fourth powers;
+\item a subpolynomial bound for a hyperbolic quadrature sum of $\vartheta(t)-t$.
+\end{itemize}
+For the latter, a barrier theorem is also proved. For each $\beta\in(1/2,1)$, the perturbation $E(t)=-t^\beta$ satisfies the following:
+\begin{itemize}
+\item $t+E(t)$ is monotone;
+\item it satisfies the classical zero-free regions (de la Vall\'ee Poussin, Vinogradov--Korobov) with room to spare;
+\item it makes the hyperbolic sum grow like a power of $Y$.
+\end{itemize}
+Consequently, no argument that uses only the monotonicity of $\vartheta$ and those regions can prove the bound.
+
+\section{Dirichlet \texorpdfstring{$L$}{L}-functions}\label{sec:dirichlet}
+
+Let $\chi$ be a non-principal character modulo $N$, and let $S_\chi(y)=\sum_{n\le y}\chi(n)$, $P_{Q,\chi}(s)=\sum_{d\le Q}\mu(d)\chi(d)d^{-s}$ and
+\[
+\sigma_{Q,\chi}(k)=1-\sum_{d\le Q}\mu(d)\chi(d)\,S_\chi(\lfloor k/d\rfloor),\qquad
+E_{Q,\chi}=\sum_{k\ge1}\frac{|\sigma_{Q,\chi}(k)|^2}{k(k+1)}.
+\]
+Since $L(s,\chi)$ is entire, no correction terms are needed.
+
+\begin{theorem}\label{teo:dirichlet}
+\begin{enumerate}
+\item $\sigma_{Q,\chi}(k)=0$ for $1\le k\le Q$ and $|\sigma_{Q,\chi}(k)|\le1+QN$.
+\item For $\Re s>0$:
+\[
+L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
+\int_1^\infty\sigma_{Q,\chi}(\lfloor x\rfloor)\,x^{-s-1}\,dx=\frac{1-L(s,\chi)P_{Q,\chi}(s)}{s}.
+\]
+\item If $L(\rho,\chi)=0$ with $\Re\rho>1/2$, then $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$ for all $Q$.
+\item If $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ along an unbounded sequence of values of $Q$, then $L(s,\chi)\ne0$ in $\Re s>1/2$.
+\end{enumerate}
+\end{theorem}
+
+The converse implication (GRH for $\chi$ $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$) requires the analogues for $L(s,\chi)$ of the bounds of Section~\ref{sec:cotas} and remains pending. Numerically, for characters modulo $3$, $4$ and $5$ and $Q\le1000$, $E_{Q,\chi}$ stays between $0.06$ and $0.44$.
+
+\section{Formalization and composition}\label{sec:formal}
+
+All the statements above, except the numerical ones, are proved in Lean~4.33.1 with Mathlib (revision \texttt{0df444a}):
+\begin{itemize}
+\item 26 modules for $\zeta$ (library \texttt{AMateEnergia});
+\item one module for Dirichlet $L$-functions (library \texttt{AMateDirichlet});
+\item one module with the algebraic part of Miller's test (library \texttt{AMateMiller}).
+\end{itemize}
+None of them contains \texttt{sorry}, and \texttt{\#print axioms} lists only \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}. Besides the Lean kernel, the independent checker \texttt{nanoda} also accepted the main theorems (see below).
+
+\subsection*{Composition with Alp\"oge's library}
+On 20 November 2026 a Lean library (175\,187 modules) was announced~\cite{Alpoge} that proves \texttt{riemannHypothesis : RiemannHypothesis}, with the Mathlib statement, and the non-vanishing of $L(s,\chi)$ in $\Re s>1/2$ for every Dirichlet character. MIT published a verification with several independent kernels~\cite{MIT}.
+\begin{itemize}
+\item \emph{Independent reproduction.} We compiled the library from source, at the path used by MIT, on a virtual machine of our own. The 175\,187 \texttt{.olean} files turned out to be byte-for-byte identical to MIT's list, including the only module that MIT documents as non-deterministic.
+\item \emph{Composition.} The composition
+\[
+\texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon
+\]
+compiles in a single environment with the three standard axioms.
+\item \emph{Unconditional corollaries.} In the same way one obtains Littlewood's bound $|M(n)|\le K_\delta n^{1/2+\delta}$ and $|G(y)|\le C_{\sigma}y^{\sigma}$ for every $\sigma>1/2$ (\path{AMate.mertens_raiz_alpoge} and \path{AMate.vonMangoldt_suavizada_alpoge}), also with only the three standard axioms.
+\item \emph{Binaries used in the local composition.} We used a third-party distribution of the 175\,187 binaries. Of these, 76\,968 match MIT's list byte for byte. The remaining 98\,219 are exactly those that contain the build path of that distribution: none of the identical ones contains it, and all of the differing ones do.
+\item \emph{Review with an independent kernel.} Using \texttt{lean4export} we exported the closure of the main theorems of the three libraries: 67\,319 declarations, Mathlib included. The independent checker \texttt{nanoda} accepts all of them, and the export contains only the axioms \texttt{propext}, \texttt{Quot.sound} and \texttt{Classical.choice}. Alp\"oge's part (\texttt{riemannHypothesis}) was checked by MIT with several independent kernels~\cite{MIT}.
+\end{itemize}
+
+\subsection*{Miller's test}
+As a first consequence of GRH we formalize the algebraic part of Miller's test (library \texttt{AMateMiller}):
+\begin{itemize}
+\item if $p$ is prime, every unit modulo $p$ is a strong liar;
+\item if $n\ge3$ is odd and composite, the strong liars are contained in a proper subgroup of $(\mathbb Z/n\mathbb Z)^\times$.
+\end{itemize}
+Consequently, for any $B$ such that every proper subgroup of $(\mathbb Z/n\mathbb Z)^\times$ omits a unit represented by an integer $a\le B(n)$, Miller's test with the bases $a\le B(n)$ is correct. Bach proved, assuming GRH, that $B(n)=2(\log n)^2$ works; formalizing that bound is the missing step towards a verified deterministic primality test.
+
+\begin{remark}
+Formal verification guarantees that the Lean kernel accepts the proofs. It does not replace the human mathematical review of Alp\"oge's proof, which, according to public information, has not been completed. The results of Sections 2--6 do not depend on it.
+\end{remark}
+
+\section{Related work and scope}
+
+The criterion belongs to the Nyman--Beurling--B\'aez-Duarte family. What is specific to this work is:
+\begin{itemize}
+\item the witness with correction terms;
+\item the exact formula for the exponent (Theorem~\ref{teo:calibracion});
+\item the equivalent arithmetic formulations;
+\item the complete formalization.
+\end{itemize}
+We are not aware of previous formalizations of criteria of this type. The criteria of Robin and Lagarias have already been derived in Lean alongside the MIT verification~\cite{MIT}. The mathematical novelty of the witness should be assessed by specialists.
+
+\begin{thebibliography}{99}
+\bibitem{Alpoge} L.~Alp\"oge, untitled announcement note, \url{https://alpo.ge/remark.pdf}, 20 November 2026. The note is unsigned; the attribution is based on the domain and on~\cite{MIT}.
+\bibitem{BaezDuarte} L.~B\'aez-Duarte, \emph{A strengthening of the Nyman--Beurling criterion for the Riemann hypothesis}, Atti Accad.\ Naz.\ Lincei Rend.\ Lincei Mat.\ Appl.\ 14 (2003), no.~1, 5--11. arXiv:math/0202141.
+\bibitem{BalazardSaias} M.~Balazard, E.~Saias, \emph{The Nyman--Beurling equivalent form for the Riemann hypothesis}, Expo.\ Math.\ 18 (2000), 131--138.
+\bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
+\bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), suppl.~2, S30--S36. arXiv:1211.5191.
+\bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), no.~1, 56--70. arXiv:math/0103058.
+\bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}, accessed 23 November 2026.
+\bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, thesis, Uppsala, 1950.
+\end{thebibliography}
+
+\end{document}
