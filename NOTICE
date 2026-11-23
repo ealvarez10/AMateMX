@@ -1,0 +1,13 @@
+AMate
+Copyright 2026 Ernesto Álvarez
+
+The Lean source code, scripts and verification files in this repository are
+licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The paper in the articulo/ directory (all language versions, LaTeX source and
+PDF) is licensed under the Creative Commons Attribution 4.0 International
+License (CC BY 4.0); see articulo/LICENSE.md.
+
+This project builds on Mathlib (https://github.com/leanprover-community/mathlib4),
+which is licensed under the Apache License, Version 2.0. The optional files in
+AMateConAlpoge/ refer to an external Lean library that is not distributed here.
