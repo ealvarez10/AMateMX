@@ -28,8 +28,25 @@ Run with `lake env lean Axiomas.lean` after `lake build`. Every line must list o
 #print axioms AMate.Dirichlet.integral_sigma_floor
 #print axioms AMate.Dirichlet.cota_inferior_energia_cero
 #print axioms AMate.Dirichlet.LFunction_ne_zero_de_energia_cofinal
+#print axioms AMate.Dirichlet.L_recta_critica
+#print axioms AMate.Dirichlet.P_recta_critica_L
+#print axioms AMate.Dirichlet.sin_ceros_iff_energia_theta_L
+#print axioms AMate.Dirichlet.grh_iff_energia_subpolinomial
+#print axioms AMate.Dirichlet.tendsto_log_energia_div_log_L
 
 -- Miller test
 #print axioms AMate.Miller.primo_todos_mentirosos
 #print axioms AMate.Miller.mentirosos_en_subgrupo_propio
 #print axioms AMate.Miller.test_miller_correcto
+#print axioms AMate.Miller.cotaSubgruposPropios_of_cotaCaracteres
+#print axioms AMate.Miller.esPrimoMiller_correcto
+#print axioms AMate.Miller.esPrimoMiller_id_correcto
+#print axioms AMate.Miller.cota_caracteres_de_grh'
+#print axioms AMate.Miller.esPrimoMiller_de_grh
+#print axioms AMate.Miller.cota_caracteres_de_grh_cuad'
+#print axioms AMate.Miller.esPrimoMiller_de_grh_cuad
+#print axioms AMate.Miller.Hadamard.cota_hadamard
+#print axioms AMate.Miller.Ponderada.cota_S
+#print axioms AMate.Miller.Explicito.cota_bach_explicita
+#print axioms AMate.Miller.cotaCaracteres_basesExplicitas
+#print axioms AMate.Miller.esPrimoMiller_explicito

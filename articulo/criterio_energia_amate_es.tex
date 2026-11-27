@@ -27,7 +27,7 @@
 \title[Un criterio de energ\'ia para la hip\'otesis de Riemann]{Un criterio de energ\'ia para la hip\'otesis de Riemann, su calibraci\'on y su verificaci\'on formal en Lean}
 \author{Ernesto \'Alvarez}
 \thanks{Este trabajo forma parte del proyecto AMate, de Ernesto \'Alvarez. Las bibliotecas de Lean \texttt{AMateEnergia}, \texttt{AMateDirichlet} y \texttt{AMateMiller} pertenecen a ese proyecto. Las demostraciones formales y las comprobaciones num\'ericas se desarrollaron con asistencia de modelos de lenguaje.}
-\date{23 de noviembre de 2026 (borrador)}
+\date{27 de noviembre de 2026 (borrador)}
 
 \begin{document}
 
@@ -37,7 +37,7 @@ Definimos un testigo expl\'icito $\sigma_Q$, construido con la funci\'on de M\"o
   \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
   \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
 \]
-En particular, la hip\'otesis de Riemann equivale a $E_Q\ll_\varepsilon Q^\varepsilon$, y la ausencia de ceros en $\Re s>\theta$ equivale a $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. Damos tambi\'en formulaciones equivalentes en t\'erminos de sumas de von Mangoldt y de primos, un teorema de barrera que delimita qu\'e m\'etodos no pueden cerrar una de ellas, y una extensi\'on del criterio a funciones $L$ de Dirichlet. Todos los resultados est\'an formalizados en Lean~4 con Mathlib y dependen solo de los tres axiomas est\'andar. Finalmente componemos el criterio con la biblioteca de Lean que anuncia una demostraci\'on de la hip\'otesis de Riemann (Alp\"oge, 2026), cuya compilaci\'on reproducimos de forma independiente, byte a byte, frente a la verificaci\'on publicada por el MIT.
+En particular, la hip\'otesis de Riemann equivale a $E_Q\ll_\varepsilon Q^\varepsilon$, y la ausencia de ceros en $\Re s>\theta$ equivale a $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. Damos tambi\'en formulaciones equivalentes en t\'erminos de sumas de von Mangoldt y de primos, un teorema de barrera que delimita qu\'e m\'etodos no pueden cerrar una de ellas, y la extensi\'on del criterio y de su calibraci\'on a funciones $L$ de Dirichlet. Todos los resultados est\'an formalizados en Lean~4 con Mathlib y dependen solo de los tres axiomas est\'andar. Num\'ericamente, los 5212 valores calculados de $E_Q$ con $10\le Q\le10^7$ est\'an entre $0{,}030$ y $0{,}045$, y $E_Q$ oscila en $\log Q$ con frecuencias $|\gamma\pm\gamma'|$ dadas por ordenadas de ceros de $\zeta$. Finalmente componemos el criterio con la biblioteca de Lean que anuncia una demostraci\'on de la hip\'otesis de Riemann (Alp\"oge, 2026), cuya compilaci\'on reproducimos de forma independiente, byte a byte, frente a la verificaci\'on publicada por el MIT.
 \end{abstract}
 
 \maketitle
@@ -55,6 +55,7 @@ Este trabajo propone un testigo concreto, en el espacio de sucesiones con pesos 
 \item Teorema~\ref{teo:recip}: la cota inferior expl\'icita que impone un cero fuera de la recta cr\'itica.
 \item Secci\'on~\ref{sec:equiv}: formulaciones aritm\'eticas equivalentes y un teorema de barrera.
 \item Secci\'on~\ref{sec:dirichlet}: la extensi\'on a funciones $L(s,\chi)$ de Dirichlet.
+\item Secci\'on~\ref{sec:numerica}: un estudio num\'erico de $E_Q$ hasta $Q=10^7$ y de $E_{Q,\chi}$ hasta $Q=3\cdot10^5$.
 \item Secci\'on~\ref{sec:formal}: la formalizaci\'on en Lean y la composici\'on con la biblioteca de Alp\"oge.
 \end{itemize}
 
@@ -164,18 +165,56 @@ L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
 \]
 \item Si $L(\rho,\chi)=0$ con $\Re\rho>1/2$, entonces $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$ para todo $Q$.
 \item Si $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ en una sucesi\'on no acotada de $Q$, entonces $L(s,\chi)\ne0$ en $\Re s>1/2$.
+\item Sea $1/2\le\theta<1$. Entonces $L(s,\chi)\ne0$ en $\Re s>\theta$ si y solo si, para todo $\varepsilon>0$, existe $C$ con $E_{Q,\chi}\le CQ^{2\theta-1+\varepsilon}$ para todo $Q\ge1$. En particular, GRH para $\chi$ equivale a $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$.
+\item Sin hip\'otesis, $\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_{Q,\chi})}{\log Q}=2\Theta_\chi-1$, donde $\Theta_\chi=\sup\bigl(\{1/2\}\cup\{\Re\rho:L(\rho,\chi)=0,\ 0<\Re\rho<1\}\bigr)$.
 \end{enumerate}
 \end{teorema}
 
-La implicaci\'on rec\'iproca (GRH para $\chi$ $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$) requiere los an\'alogos para $L(s,\chi)$ de las cotas de la Secci\'on~\ref{sec:cotas} y queda pendiente. Num\'ericamente, para caracteres m\'odulo $3$, $4$ y $5$ y $Q\le1000$, $E_{Q,\chi}$ se mantiene entre $0{,}06$ y $0{,}44$.
+Los puntos (5) y (6) siguen el esquema de la Secci\'on~\ref{sec:cotas}; como $L(s,\chi)$ es entera, no hay polo que compensar. La cota en la recta cr\'itica, $|L(\tfrac12+ix,\chi)|\ll(1+|x|)^{1/3}$, sale otra vez del teorema de las tres rectas. En $\Re s=1$, una sumaci\'on de Abel truncada da $|L(1+it,\chi)|\ll\log(2+|t|)$. En $\Re s=0$, la ecuaci\'on funcional del car\'acter primitivo que induce $\chi$, junto con los valores exactos de $|\Gamma|$ en las rectas $\Re s=0,\tfrac12,1$, da $|L(it,\chi)|\ll(1+|t|)^{1/2}\log(2+|t|)$. Las constantes impl\'icitas dependen de $N$. Num\'ericamente (Secci\'on~\ref{sec:numerica}), para los caracteres reales m\'odulo $3$ y $4$ y un car\'acter de orden $4$ m\'odulo $5$, y todo $1\le Q\le1000$, $E_{Q,\chi}$ est\'a entre $0{,}0561$ y $0{,}4678$.
+
+\section{Estudio num\'erico}\label{sec:numerica}
+
+Al escribir $\{k/d\}=k/d-\lfloor k/d\rfloor$, los t\'erminos lineales del testigo se cancelan:
+\[
+\sigma_Q(k)=1-A_Q(k)+Qm_Q\lfloor k/Q\rfloor-\gamma_Q\,\epsilon_Q(k),\qquad
+A_Q(k)=\sum_{n\le k}c_Q(n),\quad c_Q(n)=\sum_{d\mid n,\ d\le Q}\mu(d),
+\]
+donde $\epsilon_Q(k)\in\{0,1\}$ es la paridad de $\lfloor k/Q\rfloor$. Del mismo modo, $\sigma_{Q,\chi}(k)=1-\sum_{n\le k}\chi(n)c_Q(n)$. Una criba sobre los m\'ultiplos de cada $d\le Q$ libre de cuadrados da $c_Q(n)$ para $n\le K$ en $O(K\log Q)$ operaciones. Cortamos en $K=\max(2000Q,10^7)$ y estimamos la cola $\sum_{k>K}$ con la media de $|\sigma|^2$ en $(K/2,K]$ dividida entre $K+1$; al comparar las medias de los dos \'ultimos cuartos, el error relativo de la cola queda por debajo de $10^{-4}$ en todos los casos. El programa coincide con las definiciones literales de la formalizaci\'on (diferencia $0$ para $\chi$ y menor que $5\cdot10^{-13}$ para $\zeta$) y confirma en todos los casos que el testigo se anula al inicio (Proposici\'on~\ref{prop:mellin}(1) y Teorema~\ref{teo:dirichlet}(1)).
+
+Calculamos $E_Q$ para todo $2\le Q\le5000$, en una malla de $40$ puntos por unidad de $\log Q$ hasta $Q=10^6$, y en algunos puntos m\'as hasta $Q=10^7$: $5220$ valores en total. Calculamos $E_{Q,\chi}$ para los caracteres reales m\'odulo $3$ y $4$ y para el car\'acter m\'odulo $5$ con $\chi(2)=i$, para todo $1\le Q\le5000$ y en la misma malla hasta $Q=3\cdot10^5$.
+
+\begin{center}
+\begin{tabular}{lccccccc}
+\toprule
+$Q$ & $10$ & $10^2$ & $10^3$ & $10^4$ & $10^5$ & $10^6$ & $10^7$\\
+\midrule
+$E_Q$ & $0{,}03574$ & $0{,}03794$ & $0{,}03234$ & $0{,}03529$ & $0{,}03452$ & $0{,}03438$ & $0{,}03589$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Tama\~no de la energ\'ia}
+Para $10\le Q\le10^7$, los $5212$ valores calculados de $E_Q$ est\'an entre $0{,}0304$ y $0{,}0445$, y la media en cada d\'ecada de $Q$ est\'a entre $0{,}0356$ y $0{,}0382$, sin tendencia. Para los caracteres, con $10\le Q\le3\cdot10^5$, $E_{Q,\chi}$ est\'a en $[0{,}0541;\,0{,}2395]$ (m\'odulo $3$), $[0{,}0747;\,0{,}3332]$ (m\'odulo $4$) y $[0{,}1198;\,0{,}5151]$ (m\'odulo $5$), tambi\'en con medias planas por d\'ecada. Estos datos son compatibles con el Teorema~\ref{teo:theta} bajo RH y sugieren que $E_Q$ se mantiene acotada; no prueban nada para $Q$ mayores.
+
+\subsection*{Oscilaci\'on y ceros}
+Como funci\'on de $u=\log Q$, $E_Q$ var\'ia de forma suave a la escala de la malla, y su oscilaci\'on la organizan los ceros. El periodograma de Lomb--Scargle~\cite{Lomb,Scargle} de los valores de la malla con $30\le Q\le10^6$ tiene sus picos principales en $28{,}26$, $6{,}90$, $3{,}86$ y $2{,}44$, cerca de $2\gamma_1=28{,}27$, $\gamma_2-\gamma_1=6{,}89$, $\gamma_3-\gamma_2=3{,}99$ y $\gamma_5-\gamma_4=2{,}51$, donde $\gamma_j$ es la ordenada del $j$-\'esimo cero de $\zeta$; no hay pico en $\gamma_1=14{,}13$. Un ajuste por m\'inimos cuadrados con senoides en las $15$ frecuencias $|\gamma\pm\gamma'|\le45$ formadas con los cinco primeros ceros explica $R^2=0{,}76$ de la varianza de $E_Q$; para $200$ conjuntos de $15$ frecuencias al azar, la mediana es $0{,}17$ y el m\'aximo $0{,}57$. Los tres caracteres se comportan igual ($R^2=0{,}68$, $0{,}65$ y $0{,}76$, frente a m\'aximos al azar de $0{,}57$, $0{,}56$ y $0{,}71$); para el car\'acter m\'odulo $3$, los picos principales est\'an en $\gamma_2-\gamma_1=3{,}21$, $2\gamma_1=16{,}08$ y $\gamma_1+\gamma_2=19{,}29$. Las ordenadas de los ceros las calculamos de forma independiente, a partir de la funci\'on zeta de Hurwitz.
+
+Una heur\'istica lo explica, suponiendo RH y que los ceros son simples. La f\'ormula de Perron y la Proposici\'on~\ref{prop:mellin}(3) dan
+\[
+1-\zeta(s)P_Q(s)\approx\zeta(s)\sum_\rho\frac{Q^{\rho-s}}{(\rho-s)\,\zeta'(\rho)},\qquad
+E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
+\]
+una funci\'on casi peri\'odica de $\log Q$. La diagonal $\rho=\rho'$ da el valor medio, y los pares $\rho\ne\rho'$ dan las frecuencias $\gamma-\gamma'$, que incluyen $\gamma_i+\gamma_j$ y $2\gamma_i$ porque los ceros vienen en pares $\pm\gamma$. No demostramos esta descripci\'on; es coherente con la ausencia de crecimiento observada arriba.
+
+Los programas, los datos y las comprobaciones est\'an en el directorio \path{scripts/numerica_energia} del repositorio.
 
 \section{Formalizaci\'on y composici\'on}\label{sec:formal}
 
 Todos los enunciados anteriores, salvo los num\'ericos, est\'an demostrados en Lean~4.33.1 con Mathlib (revisi\'on \texttt{0df444a}):
 \begin{itemize}
 \item 26 m\'odulos para $\zeta$ (biblioteca \texttt{AMateEnergia});
-\item un m\'odulo para funciones $L$ de Dirichlet (biblioteca \texttt{AMateDirichlet});
-\item un m\'odulo con la parte algebraica del test de Miller (biblioteca \texttt{AMateMiller}).
+\item ocho m\'odulos para funciones $L$ de Dirichlet (biblioteca \texttt{AMateDirichlet});
+\item 26 m\'odulos para el test de Miller y la cota de Bach expl\'icita (biblioteca \texttt{AMateMiller}).
 \end{itemize}
 Ninguno contiene \texttt{sorry}, y \texttt{\#print axioms} lista solo \texttt{propext}, \texttt{Classical.choice} y \texttt{Quot.sound}. Adem\'as de por el n\'ucleo de Lean, los teoremas principales fueron aceptados por el verificador independiente \texttt{nanoda} (ver abajo).
 
@@ -190,19 +229,21 @@ El 20 de noviembre de 2026 se anunci\'o~\cite{Alpoge} una biblioteca de Lean (17
 compila en un solo entorno con los tres axiomas est\'andar.
 \item \emph{Corolarios sin hip\'otesis.} De igual modo se obtienen la cota de Littlewood $|M(n)|\le K_\delta n^{1/2+\delta}$ y $|G(y)|\le C_{\sigma}y^{\sigma}$ para todo $\sigma>1/2$ (\path{AMate.mertens_raiz_alpoge} y \path{AMate.vonMangoldt_suavizada_alpoge}), tambi\'en con solo los tres axiomas est\'andar.
 \item \emph{Binarios usados en la composici\'on local.} Usamos una distribuci\'on de terceros de los 175\,187 binarios. De ellos, 76\,968 coinciden byte a byte con la lista del MIT. Los 98\,219 restantes son exactamente los que contienen la ruta de compilaci\'on de esa distribuci\'on: ninguno de los id\'enticos la contiene y todos los distintos s\'i.
-\item \emph{Revisi\'on con un n\'ucleo independiente.} Exportamos con \texttt{lean4export} el cierre de los teoremas principales de las tres bibliotecas: 67\,319 declaraciones, Mathlib incluida. El verificador independiente \texttt{nanoda} las acepta todas, y la exportaci\'on solo contiene los axiomas \texttt{propext}, \texttt{Quot.sound} y \texttt{Classical.choice}. La parte de Alp\"oge (\texttt{riemannHypothesis}) fue revisada por el MIT con varios n\'ucleos independientes~\cite{MIT}.
+\item \emph{Revisi\'on con un n\'ucleo independiente.} Exportamos con \texttt{lean4export} el cierre de los teoremas principales de las tres bibliotecas: 76\,387 declaraciones, Mathlib incluida. El verificador independiente \texttt{nanoda} las acepta todas, y la exportaci\'on solo contiene los axiomas \texttt{propext}, \texttt{Quot.sound} y \texttt{Classical.choice}. La parte de Alp\"oge (\texttt{riemannHypothesis}) fue revisada por el MIT con varios n\'ucleos independientes~\cite{MIT}.
 \end{itemize}
 
 \subsection*{Test de Miller}
-Como primera consecuencia de GRH formalizamos la parte algebraica del test de Miller (biblioteca \texttt{AMateMiller}):
+Como consecuencia de GRH formalizamos el test de Miller (biblioteca \texttt{AMateMiller}):
 \begin{itemize}
 \item si $p$ es primo, toda unidad m\'odulo $p$ es mentirosa fuerte;
 \item si $n\ge3$ es impar y compuesto, los mentirosos fuertes est\'an contenidos en un subgrupo propio de $(\mathbb Z/n\mathbb Z)^\times$.
 \end{itemize}
-En consecuencia, para cualquier $B$ tal que todo subgrupo propio de $(\mathbb Z/n\mathbb Z)^\times$ omita una unidad representada por un entero $a\le B(n)$, el test de Miller con las bases $a\le B(n)$ es correcto. Bach demostr\'o, suponiendo GRH, que vale $B(n)=2(\log n)^2$; formalizar esa cota es el paso que falta para tener un test de primalidad determinista verificado.
+Todo subgrupo propio $H$ est\'a contenido en el n\'ucleo de un car\'acter de Dirichlet no principal, por la dualidad del grupo abeliano finito $(\mathbb Z/n\mathbb Z)^\times/H$. En consecuencia, si todo car\'acter no principal m\'odulo $n$ toma un valor distinto de $1$ en alg\'un $a\le B(n)$ coprimo con $n$, el test de Miller con las bases $a\le B(n)$ es correcto. El test es ejecutable en Lean (\texttt{esPrimoMiller}, con exponenciaci\'on modular r\'apida), y \texttt{esPrimoMiller\_correcto} demuestra que decide la primalidad para todo $B$ as\'i; con $B(n)=n$ la hip\'otesis se cumple trivialmente. Suponiendo GRH, la f\'ormula expl\'icita truncada para $\psi(x,\chi)$ y la cota del n\'umero de ceros en ventanas de altura $1$, demostramos que $B(n)=\lfloor K(1+\log n)^4\rfloor$ sirve para alguna constante $K$; la f\'ormula expl\'icita aplicada al car\'acter trivial m\'odulo $1$ da la cota inferior de $\psi(x)$. Integrando la f\'ormula expl\'icita sobre $[x/2,x]$, el exponente baja a $2$: tambi\'en sirve $B(n)=\lfloor K(1+\log n)^2\rfloor$. La biblioteca de Alp\"oge demuestra esos tres ingredientes. Su composici\'on con estos resultados da tests de Miller deterministas con $O((\log n)^4)$ y $O((\log n)^2)$ bases, sin hip\'otesis, y la composici\'on con el Teorema~\ref{teo:dirichlet}(5) da $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ para todo $\chi$ no principal. Ambas composiciones est\'an escritas y comprobadas contra copias literales de los enunciados que usan; falta compilarlas con la biblioteca de Alp\"oge.
+
+Esas constantes $K$ no son expl\'icitas. Para tener un test certificado demostramos tambi\'en la cota de Bach con constante expl\'icita (\texttt{cota\_bach\_explicita}). Suponemos GRH y varios enunciados anal\'iticos de la biblioteca de Alp\"oge: la f\'ormula de Cauchy en rect\'angulos, la localizaci\'on y la finitud de los ceros, la parte regular y la ecuaci\'on funcional de $L'/L$, cotas de la funci\'on digamma, alturas buenas y la serie de la digamma. Entonces, si $\log n\ge 64$, todo car\'acter no principal m\'odulo $n$ toma un valor distinto de $1$ en alg\'un $a\le 2(\log n)^2$ coprimo con $n$. La demostraci\'on usa el n\'ucleo $x^s/((s+\alpha)(s+\beta))$ con $\alpha=2/5$, $\beta=9/20$ y $x=2(\log n)^2$, la f\'ormula expl\'icita ponderada para el car\'acter primitivo asociado y para $\zeta$, una cota de tipo Hadamard para la suma sobre los ceros, y cotas expl\'icitas del borde izquierdo, de los residuos y de las potencias de los primos que dividen a $n$. En consecuencia, el test con $(\lfloor\log_2 n\rfloor+1)^2$ bases para $n\ge 2^{93}$, y con todas las bases $a\le n$ para $n<2^{93}$, decide la primalidad (\texttt{esPrimoMiller\_explicito}) y se ejecuta en Lean. Esos enunciados se instancian con los teoremas de Alp\"oge en un archivo que no importa el m\'odulo principal de su biblioteca; lo compilamos contra ella y solo usa los tres axiomas est\'andar. Con la GRH de esa biblioteca el test queda sin hip\'otesis, en una composici\'on que falta compilar.
 
 \begin{observacion}
-La verificaci\'on formal garantiza que el n\'ucleo de Lean acepta las demostraciones. No sustituye la revisi\'on matem\'atica humana de la demostraci\'on de Alp\"oge, que seg\'un la informaci\'on p\'ublica no ha concluido. Los resultados de las secciones 2--6 no dependen de ella.
+La verificaci\'on formal garantiza que el n\'ucleo de Lean acepta las demostraciones. No sustituye la revisi\'on matem\'atica humana de la demostraci\'on de Alp\"oge, que seg\'un la informaci\'on p\'ublica no ha concluido. Los resultados de las secciones 2--7 no dependen de ella.
 \end{observacion}
 
 \section{Trabajo relacionado y alcance}
@@ -223,8 +264,10 @@ No conocemos formalizaciones previas de criterios de este tipo. Robin y Lagarias
 \bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
 \bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), supl.~2, S30--S36. arXiv:1211.5191.
 \bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), n\'um.~1, 56--70. arXiv:math/0103058.
+\bibitem{Lomb} N.~R.~Lomb, \emph{Least-squares frequency analysis of unequally spaced data}, Astrophys.\ Space Sci.\ 39 (1976), 447--462.
 \bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}, consultado el 23 de noviembre de 2026.
 \bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, tesis, Uppsala, 1950.
+\bibitem{Scargle} J.~D.~Scargle, \emph{Studies in astronomical time series analysis.~II. Statistical aspects of spectral analysis of unevenly spaced data}, Astrophys.\ J.\ 263 (1982), 835--853.
 \end{thebibliography}
 
 \end{document}

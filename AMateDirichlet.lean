@@ -1,1 +1,8 @@
 import AMateDirichlet.Testigo
+import AMateDirichlet.EnergiaFourier
+import AMateDirichlet.LRectaCritica
+import AMateDirichlet.LRectaCero
+import AMateDirichlet.LTresRectas
+import AMateDirichlet.InversaL
+import AMateDirichlet.PerronL
+import AMateDirichlet.Calibracion

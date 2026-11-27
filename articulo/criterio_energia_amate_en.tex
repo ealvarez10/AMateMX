@@ -26,7 +26,7 @@
 \title[An energy criterion for the Riemann hypothesis]{An energy criterion for the Riemann hypothesis, its calibration and its formal verification in Lean}
 \author{Ernesto \'Alvarez}
 \thanks{This work is part of the AMate project, by Ernesto \'Alvarez. The Lean libraries \texttt{AMateEnergia}, \texttt{AMateDirichlet} and \texttt{AMateMiller} belong to that project. The formal proofs and the numerical checks were developed with the assistance of language models.}
-\date{23 November 2026}
+\date{27 November 2026}
 
 \begin{document}
 
@@ -36,7 +36,7 @@ We define an explicit witness $\sigma_Q$, built from the M\"obius function, frac
   \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
   \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
 \]
-In particular, the Riemann hypothesis is equivalent to $E_Q\ll_\varepsilon Q^\varepsilon$, and the absence of zeros in $\Re s>\theta$ is equivalent to $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. We also give equivalent formulations in terms of von Mangoldt sums and sums over primes, a barrier theorem that delimits which methods cannot establish one of them, and an extension of one direction of the criterion to Dirichlet $L$-functions. All the stated theorems are formalized in Lean~4 with Mathlib, depend only on the three standard axioms, and were rechecked by the independent kernel \texttt{nanoda}. Finally, we compose the criterion with the Lean library that announces a proof of the Riemann hypothesis (Alp\"oge, 2026), which has been machine-checked but not yet peer reviewed; we reproduce its compilation independently, byte for byte, against the verification published by MIT.
+In particular, the Riemann hypothesis is equivalent to $E_Q\ll_\varepsilon Q^\varepsilon$, and the absence of zeros in $\Re s>\theta$ is equivalent to $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. We also give equivalent formulations in terms of von Mangoldt sums and sums over primes, a barrier theorem that delimits which methods cannot establish one of them, and the extension of the criterion and of its calibration to Dirichlet $L$-functions. All the stated theorems are formalized in Lean~4 with Mathlib, depend only on the three standard axioms, and were rechecked by the independent kernel \texttt{nanoda}. Numerically, the 5212 computed values of $E_Q$ with $10\le Q\le10^7$ lie between $0.030$ and $0.045$, and $E_Q$ oscillates in $\log Q$ with frequencies $|\gamma\pm\gamma'|$ given by ordinates of zeros of $\zeta$. Finally, we compose the criterion with the Lean library that announces a proof of the Riemann hypothesis (Alp\"oge, 2026), which has been machine-checked but not yet peer reviewed; we reproduce its compilation independently, byte for byte, against the verification published by MIT.
 \end{abstract}
 
 \maketitle
@@ -54,6 +54,7 @@ This paper proposes a concrete witness, in the space of sequences with weights $
 \item Theorem~\ref{teo:recip}: the explicit lower bound forced by a zero off the critical line.
 \item Section~\ref{sec:equiv}: equivalent arithmetic formulations and a barrier theorem.
 \item Section~\ref{sec:dirichlet}: the extension to Dirichlet $L$-functions $L(s,\chi)$.
+\item Section~\ref{sec:numerica}: a numerical study of $E_Q$ up to $Q=10^7$ and of $E_{Q,\chi}$ up to $Q=3\cdot10^5$.
 \item Section~\ref{sec:formal}: the formalization in Lean and the composition with Alp\"oge's library.
 \end{itemize}
 
@@ -163,18 +164,56 @@ L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
 \]
 \item If $L(\rho,\chi)=0$ with $\Re\rho>1/2$, then $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$ for all $Q$.
 \item If $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ along an unbounded sequence of values of $Q$, then $L(s,\chi)\ne0$ in $\Re s>1/2$.
+\item Let $1/2\le\theta<1$. Then $L(s,\chi)\ne0$ in $\Re s>\theta$ if and only if, for every $\varepsilon>0$, there is $C$ with $E_{Q,\chi}\le CQ^{2\theta-1+\varepsilon}$ for all $Q\ge1$. In particular, GRH for $\chi$ is equivalent to $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$.
+\item Unconditionally, $\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_{Q,\chi})}{\log Q}=2\Theta_\chi-1$, where $\Theta_\chi=\sup\bigl(\{1/2\}\cup\{\Re\rho:L(\rho,\chi)=0,\ 0<\Re\rho<1\}\bigr)$.
 \end{enumerate}
 \end{theorem}
 
-The converse implication (GRH for $\chi$ $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$) requires the analogues for $L(s,\chi)$ of the bounds of Section~\ref{sec:cotas} and remains pending. Numerically, for characters modulo $3$, $4$ and $5$ and $Q\le1000$, $E_{Q,\chi}$ stays between $0.06$ and $0.44$.
+Items (5) and (6) follow the scheme of Section~\ref{sec:cotas}; since $L(s,\chi)$ is entire, no pole needs to be compensated. The bound on the critical line, $|L(\tfrac12+ix,\chi)|\ll(1+|x|)^{1/3}$, again comes from the three-lines theorem. On $\Re s=1$, a truncated Abel summation gives $|L(1+it,\chi)|\ll\log(2+|t|)$. On $\Re s=0$, the functional equation of the primitive character that induces $\chi$, together with the exact values of $|\Gamma|$ on the lines $\Re s=0,\tfrac12,1$, gives $|L(it,\chi)|\ll(1+|t|)^{1/2}\log(2+|t|)$. The implied constants depend on $N$. Numerically (Section~\ref{sec:numerica}), for the real characters modulo $3$ and $4$ and a character of order $4$ modulo $5$, and every $1\le Q\le1000$, $E_{Q,\chi}$ lies between $0.0561$ and $0.4678$.
+
+\section{Numerical study}\label{sec:numerica}
+
+Writing $\{k/d\}=k/d-\lfloor k/d\rfloor$, the linear terms of the witness cancel:
+\[
+\sigma_Q(k)=1-A_Q(k)+Qm_Q\lfloor k/Q\rfloor-\gamma_Q\,\epsilon_Q(k),\qquad
+A_Q(k)=\sum_{n\le k}c_Q(n),\quad c_Q(n)=\sum_{d\mid n,\ d\le Q}\mu(d),
+\]
+where $\epsilon_Q(k)\in\{0,1\}$ is the parity of $\lfloor k/Q\rfloor$. Likewise, $\sigma_{Q,\chi}(k)=1-\sum_{n\le k}\chi(n)c_Q(n)$. A sieve over the multiples of each squarefree $d\le Q$ gives $c_Q(n)$ for $n\le K$ in $O(K\log Q)$ operations. We truncate at $K=\max(2000Q,10^7)$ and estimate the tail $\sum_{k>K}$ by the mean of $|\sigma|^2$ on $(K/2,K]$ divided by $K+1$; comparing the means of the last two quarters bounds the relative error of the tail by $10^{-4}$ in every case. The program agrees with the literal definitions of the formalization (difference $0$ for $\chi$, below $5\cdot10^{-13}$ for $\zeta$) and confirms in every case that the witness vanishes at the start (Proposition~\ref{prop:mellin}(1) and Theorem~\ref{teo:dirichlet}(1)).
+
+We computed $E_Q$ for every $2\le Q\le5000$, on a grid of $40$ points per unit of $\log Q$ up to $Q=10^6$, and at a few further points up to $Q=10^7$: $5220$ values in total. We computed $E_{Q,\chi}$ for the real characters modulo $3$ and $4$ and for the character modulo $5$ with $\chi(2)=i$, for every $1\le Q\le5000$ and on the same grid up to $Q=3\cdot10^5$.
+
+\begin{center}
+\begin{tabular}{lccccccc}
+\toprule
+$Q$ & $10$ & $10^2$ & $10^3$ & $10^4$ & $10^5$ & $10^6$ & $10^7$\\
+\midrule
+$E_Q$ & $0.03574$ & $0.03794$ & $0.03234$ & $0.03529$ & $0.03452$ & $0.03438$ & $0.03589$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Size of the energy}
+For $10\le Q\le10^7$, the $5212$ computed values of $E_Q$ lie between $0.0304$ and $0.0445$, and the mean over each decade of $Q$ lies between $0.0356$ and $0.0382$, without trend. For the characters, with $10\le Q\le3\cdot10^5$, $E_{Q,\chi}$ lies in $[0.0541,0.2395]$ (modulo $3$), $[0.0747,0.3332]$ (modulo $4$) and $[0.1198,0.5151]$ (modulo $5$), also with flat means per decade. These data are compatible with Theorem~\ref{teo:theta} under RH, and they suggest that $E_Q$ stays bounded; they prove nothing for larger $Q$.
+
+\subsection*{Oscillation and zeros}
+As a function of $u=\log Q$, $E_Q$ varies smoothly on the scale of the grid, and its oscillation is organised by the zeros. The Lomb--Scargle periodogram~\cite{Lomb,Scargle} of the values on the grid with $30\le Q\le10^6$ has its main peaks at $28.26$, $6.90$, $3.86$ and $2.44$, close to $2\gamma_1=28.27$, $\gamma_2-\gamma_1=6.89$, $\gamma_3-\gamma_2=3.99$ and $\gamma_5-\gamma_4=2.51$, where $\gamma_j$ is the ordinate of the $j$-th zero of $\zeta$; there is no peak at $\gamma_1=14.13$. A least-squares fit with sinusoids at the $15$ frequencies $|\gamma\pm\gamma'|\le45$ formed with the first five zeros explains $R^2=0.76$ of the variance of $E_Q$; for $200$ sets of $15$ random frequencies the median is $0.17$ and the maximum $0.57$. The three characters behave in the same way ($R^2=0.68$, $0.65$ and $0.76$, against random maxima of $0.57$, $0.56$ and $0.71$); for the character modulo $3$ the main peaks are at $\gamma_2-\gamma_1=3.21$, $2\gamma_1=16.08$ and $\gamma_1+\gamma_2=19.29$. We computed the ordinates of the zeros independently, from the Hurwitz zeta function.
+
+A heuristic explains this, assuming RH and that the zeros are simple. Perron's formula and Proposition~\ref{prop:mellin}(3) give
+\[
+1-\zeta(s)P_Q(s)\approx\zeta(s)\sum_\rho\frac{Q^{\rho-s}}{(\rho-s)\,\zeta'(\rho)},\qquad
+E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
+\]
+an almost periodic function of $\log Q$. The diagonal $\rho=\rho'$ gives the mean value, and the pairs $\rho\ne\rho'$ give the frequencies $\gamma-\gamma'$, which include $\gamma_i+\gamma_j$ and $2\gamma_i$ because the zeros come in pairs $\pm\gamma$. We do not prove this description; it is consistent with the absence of growth observed above.
+
+The programs, the data and the checks are in the directory \path{scripts/numerica_energia} of the repository.
 
 \section{Formalization and composition}\label{sec:formal}
 
 All the statements above, except the numerical ones, are proved in Lean~4.33.1 with Mathlib (revision \texttt{0df444a}):
 \begin{itemize}
 \item 26 modules for $\zeta$ (library \texttt{AMateEnergia});
-\item one module for Dirichlet $L$-functions (library \texttt{AMateDirichlet});
-\item one module with the algebraic part of Miller's test (library \texttt{AMateMiller}).
+\item eight modules for Dirichlet $L$-functions (library \texttt{AMateDirichlet});
+\item 26 modules for Miller's test and the explicit Bach bound (library \texttt{AMateMiller}).
 \end{itemize}
 None of them contains \texttt{sorry}, and \texttt{\#print axioms} lists only \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}. Besides the Lean kernel, the independent checker \texttt{nanoda} also accepted the main theorems (see below).
 
@@ -189,19 +228,21 @@ On 20 November 2026 a Lean library (175\,187 modules) was announced~\cite{Alpoge
 compiles in a single environment with the three standard axioms.
 \item \emph{Unconditional corollaries.} In the same way one obtains Littlewood's bound $|M(n)|\le K_\delta n^{1/2+\delta}$ and $|G(y)|\le C_{\sigma}y^{\sigma}$ for every $\sigma>1/2$ (\path{AMate.mertens_raiz_alpoge} and \path{AMate.vonMangoldt_suavizada_alpoge}), also with only the three standard axioms.
 \item \emph{Binaries used in the local composition.} We used a third-party distribution of the 175\,187 binaries. Of these, 76\,968 match MIT's list byte for byte. The remaining 98\,219 are exactly those that contain the build path of that distribution: none of the identical ones contains it, and all of the differing ones do.
-\item \emph{Review with an independent kernel.} Using \texttt{lean4export} we exported the closure of the main theorems of the three libraries: 67\,319 declarations, Mathlib included. The independent checker \texttt{nanoda} accepts all of them, and the export contains only the axioms \texttt{propext}, \texttt{Quot.sound} and \texttt{Classical.choice}. Alp\"oge's part (\texttt{riemannHypothesis}) was checked by MIT with several independent kernels~\cite{MIT}.
+\item \emph{Review with an independent kernel.} Using \texttt{lean4export} we exported the closure of the main theorems of the three libraries: 76\,387 declarations, Mathlib included. The independent checker \texttt{nanoda} accepts all of them, and the export contains only the axioms \texttt{propext}, \texttt{Quot.sound} and \texttt{Classical.choice}. Alp\"oge's part (\texttt{riemannHypothesis}) was checked by MIT with several independent kernels~\cite{MIT}.
 \end{itemize}
 
 \subsection*{Miller's test}
-As a first consequence of GRH we formalize the algebraic part of Miller's test (library \texttt{AMateMiller}):
+As a consequence of GRH we formalize Miller's test (library \texttt{AMateMiller}):
 \begin{itemize}
 \item if $p$ is prime, every unit modulo $p$ is a strong liar;
 \item if $n\ge3$ is odd and composite, the strong liars are contained in a proper subgroup of $(\mathbb Z/n\mathbb Z)^\times$.
 \end{itemize}
-Consequently, for any $B$ such that every proper subgroup of $(\mathbb Z/n\mathbb Z)^\times$ omits a unit represented by an integer $a\le B(n)$, Miller's test with the bases $a\le B(n)$ is correct. Bach proved, assuming GRH, that $B(n)=2(\log n)^2$ works; formalizing that bound is the missing step towards a verified deterministic primality test.
+Every proper subgroup $H$ is contained in the kernel of a non-principal Dirichlet character, by duality for the finite abelian group $(\mathbb Z/n\mathbb Z)^\times/H$. Consequently, if every non-principal character modulo $n$ takes a value different from $1$ at some $a\le B(n)$ coprime to $n$, Miller's test with the bases $a\le B(n)$ is correct. The test is executable in Lean (\texttt{esPrimoMiller}, with fast modular exponentiation), and \texttt{esPrimoMiller\_correcto} proves that it decides primality for every such $B$; with $B(n)=n$ the hypothesis holds trivially. Assuming GRH, the truncated explicit formula for $\psi(x,\chi)$ and the bound for the number of zeros in windows of height $1$, we prove that $B(n)=\lfloor K(1+\log n)^4\rfloor$ works for some constant $K$; the explicit formula applied to the trivial character modulo $1$ supplies the lower bound for $\psi(x)$. Integrating the explicit formula over $[x/2,x]$ lowers the exponent to $2$: $B(n)=\lfloor K(1+\log n)^2\rfloor$ also works. Alp\"oge's library proves these three ingredients. Its composition with these results gives deterministic Miller tests with $O((\log n)^4)$ and $O((\log n)^2)$ bases, without hypotheses, and the composition with Theorem~\ref{teo:dirichlet}(5) gives $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ for every non-principal $\chi$. Both compositions are written and type-check against literal copies of the statements they use; compiling them with Alp\"oge's library is pending.
+
+These constants $K$ are not explicit. To obtain a certified test we also prove Bach's bound with an explicit constant (\texttt{cota\_bach\_explicita}). We assume GRH and several analytic statements of Alp\"oge's library: Cauchy's formula on rectangles, the location and finiteness of the zeros, the regular part and the functional equation of $L'/L$, bounds for the digamma function, good heights, and the digamma series. Then, if $\log n\ge 64$, every non-principal character modulo $n$ takes a value different from $1$ at some $a\le 2(\log n)^2$ coprime to $n$. The proof uses the kernel $x^s/((s+\alpha)(s+\beta))$ with $\alpha=2/5$, $\beta=9/20$ and $x=2(\log n)^2$, the weighted explicit formula for the associated primitive character and for $\zeta$, a Hadamard-type bound for the sum over the zeros, and explicit bounds for the left edge, the residues and the powers of the primes dividing $n$. Consequently, the test with $(\lfloor\log_2 n\rfloor+1)^2$ bases for $n\ge 2^{93}$, and with all bases $a\le n$ for $n<2^{93}$, decides primality (\texttt{esPrimoMiller\_explicito}) and runs in Lean. Those statements are instantiated with Alp\"oge's theorems in a file that does not import the main module of that library; we compiled it against the library, and it uses only the three standard axioms. With that library's GRH the test holds without hypotheses, in a composition that is still to be compiled.
 
 \begin{remark}
-Formal verification guarantees that the Lean kernel accepts the proofs. It does not replace the human mathematical review of Alp\"oge's proof, which, according to public information, has not been completed. The results of Sections 2--6 do not depend on it.
+Formal verification guarantees that the Lean kernel accepts the proofs. It does not replace the human mathematical review of Alp\"oge's proof, which, according to public information, has not been completed. The results of Sections 2--7 do not depend on it.
 \end{remark}
 
 \section{Related work and scope}
@@ -222,8 +263,10 @@ We are not aware of previous formalizations of criteria of this type. The criter
 \bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
 \bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), suppl.~2, S30--S36. arXiv:1211.5191.
 \bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), no.~1, 56--70. arXiv:math/0103058.
+\bibitem{Lomb} N.~R.~Lomb, \emph{Least-squares frequency analysis of unequally spaced data}, Astrophys.\ Space Sci.\ 39 (1976), 447--462.
 \bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}, accessed 23 November 2026.
 \bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, thesis, Uppsala, 1950.
+\bibitem{Scargle} J.~D.~Scargle, \emph{Studies in astronomical time series analysis.~II. Statistical aspects of spectral analysis of unevenly spaced data}, Astrophys.\ J.\ 263 (1982), 835--853.
 \end{thebibliography}
 
 \end{document}

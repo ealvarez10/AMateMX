@@ -5,8 +5,8 @@ authors:
   - family-names: "Álvarez"
     given-names: "Ernesto"
     affiliation: "Independent researcher, Mexico"
-version: "2026-11-23"
-date-released: "2026-11-23"
+version: "2026-11-27"
+date-released: "2026-11-27"
 license: Apache-2.0
 keywords:
   - "Riemann hypothesis"

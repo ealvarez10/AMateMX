@@ -20,7 +20,9 @@ name = "AMateEnergia"
 [[lean_lib]]
 name = "AMateDirichlet"
 
-# Miller test: algebraic part and correctness given a Bach-type bound (Mathlib only).
+# Miller test: algebraic part, correctness given a Bach-type bound, and the Bach
+# bound 2(log n)^2 with explicit constant from GRH and Alpöge's analytic
+# statements taken as hypotheses (Mathlib only).
 [[lean_lib]]
 name = "AMateMiller"
 
@@ -35,3 +37,6 @@ name = "AMateMiller"
 #
 # [[lean_lib]]
 # name = "AMateConAlpoge"
+# roots = ["AMateConAlpoge.Composicion", "AMateConAlpoge.Consecuencias",
+#   "AMateConAlpoge.VerificacionConjunta", "AMateConAlpoge.ComposicionDirichlet",
+#   "AMateConAlpoge.HipotesisAlpoge", "AMateConAlpoge.MillerAlpoge"]

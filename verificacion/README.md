@@ -18,13 +18,17 @@ Result ([resultado.txt](reproduccion_vm/resultado.txt), [comparacion_mit.txt](re
 
 The full result archive (34 MB, with the hash of every module and the build logs) is not in this repository. Its SHA-256 is in [amate_resultado.tar.gz.sha256](reproduccion_vm/amate_resultado.tar.gz.sha256).
 
-## `nanoda/`: independent kernel recheck (23 November 2026)
+## `nanoda/`: independent kernel recheck (27 November 2026)
 
 The main theorems of `AMateEnergia`, `AMateDirichlet` and `AMateMiller` were exported with `lean4export` and checked by `nanoda`:
 
-- **Export:** the main theorems with all their dependencies, Mathlib included. It was 538,362,564 bytes; its SHA-256 is in [amate.ndjson.sha256](nanoda/amate.ndjson.sha256).
+- **Export:** the main theorems with all their dependencies, Mathlib included. It was 687,557,410 bytes; its SHA-256 is in [amate.ndjson.sha256](nanoda/amate.ndjson.sha256).
 - **Tool versions:** `lean4export` tag v4.33.0 (commit `15f6055`), built with Lean 4.33.1, and `nanoda_lib` commit `0da9f98` (v0.4.32).
-- **Result:** "Checked 67319 declarations with no errors" ([nanoda_salida.txt](nanoda/nanoda_salida.txt)). Only `propext`, `Quot.sound` and `Classical.choice` were permitted, and they are the only axioms in the export.
+- **Result:** "Checked 76387 declarations with no errors" ([nanoda_salida.txt](nanoda/nanoda_salida.txt)). Only `propext`, `Quot.sound` and `Classical.choice` were permitted, and they are the only axioms in the export.
 - **Statements:** the statements printed by nanoda match the Lean sources ([enunciados_nanoda.txt](nanoda/enunciados_nanoda.txt)).
 
 To reproduce it, see [../scripts/verificar_con_nanoda.sh](../scripts/verificar_con_nanoda.sh).
+
+## `reproduccion_vm/amate_composiciones_vm.sh`: new compositions (prepared, not yet run)
+
+Run after `amate_alpoge_vm.sh`, on the same machine, it compiles `AMateConAlpoge/ComposicionDirichlet.lean` (E_{Q,χ} ≪_ε Q^ε and Θ_χ = 1/2 for every χ ≠ 1), `AMateConAlpoge/HipotesisAlpoge.lean` and `AMateConAlpoge/MillerAlpoge.lean` (deterministic Miller tests with O((log n)^4) and O((log n)^2) bases, Bach's bound a ≤ 2(log n)² for log n ≥ 64, and the certified executable test `esPrimoMiller basesExplicitas`), and checks that the axioms of ten declarations are only `propext`, `Classical.choice` and `Quot.sound`. Locally, `ComposicionDirichlet.lean` and `MillerAlpoge.lean` were type-checked against literal copies of the statements they use from Alpöge's library, with those statements as placeholders. `HipotesisAlpoge.lean` does not import `Main`, so it was compiled locally against the compiled library (27 November 2026): `hipHadamard_alpoge`, `serieDigamma_alpoge`, `cota_bach_explicita_de_grh` and `esPrimoMiller_explicito_de_grh` depend only on the three standard axioms.

@@ -27,7 +27,7 @@
 \title[Un crit\`ere d'\'energie pour l'hypoth\`ese de Riemann]{Un crit\`ere d'\'energie pour l'hypoth\`ese de Riemann, sa calibration et sa v\'erification formelle en Lean}
 \author{Ernesto \'Alvarez}
 \thanks{Ce travail fait partie du projet AMate, d'Ernesto \'Alvarez. Les biblioth\`eques de Lean \texttt{AMateEnergia}, \texttt{AMateDirichlet} et \texttt{AMateMiller} appartiennent \`a ce projet. Les d\'emonstrations formelles et les v\'erifications num\'eriques ont \'et\'e d\'evelopp\'ees avec l'assistance de mod\`eles de langage.}
-\date{23 novembre 2026 (brouillon)}
+\date{27 novembre 2026 (brouillon)}
 
 \begin{document}
 
@@ -37,7 +37,7 @@ Nous d\'efinissons un t\'emoin explicite $\sigma_Q$, construit \`a l'aide de la 
   \lim_{Q\to\infty}\frac{\log(2+E_Q)}{\log Q}=2\Theta-1,
   \qquad \Theta=\sup\bigl(\{1/2\}\cup\{\Re\rho:\zeta(\rho)=0,\ 0<\Re\rho<1\}\bigr).
 \]
-En particulier, l'hypoth\`ese de Riemann \'equivaut \`a $E_Q\ll_\varepsilon Q^\varepsilon$, et l'absence de z\'eros dans $\Re s>\theta$ \'equivaut \`a $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. Nous donnons aussi des formulations \'equivalentes en termes de sommes de von Mangoldt et de nombres premiers, un th\'eor\`eme de barri\`ere qui d\'elimite les m\'ethodes qui ne peuvent pas \'etablir l'une d'entre elles, et une extension du crit\`ere aux fonctions $L$ de Dirichlet. Tous les r\'esultats sont formalis\'es en Lean~4 avec Mathlib et ne d\'ependent que des trois axiomes standard. Enfin, nous composons le crit\`ere avec la biblioth\`eque Lean qui annonce une d\'emonstration de l'hypoth\`ese de Riemann (Alp\"oge, 2026), dont nous reproduisons ind\'ependamment la compilation, en la confrontant octet par octet \`a la v\'erification publi\'ee par le MIT.
+En particulier, l'hypoth\`ese de Riemann \'equivaut \`a $E_Q\ll_\varepsilon Q^\varepsilon$, et l'absence de z\'eros dans $\Re s>\theta$ \'equivaut \`a $E_Q\ll_\varepsilon Q^{2\theta-1+\varepsilon}$. Nous donnons aussi des formulations \'equivalentes en termes de sommes de von Mangoldt et de nombres premiers, un th\'eor\`eme de barri\`ere qui d\'elimite les m\'ethodes qui ne peuvent pas \'etablir l'une d'entre elles, et l'extension du crit\`ere et de sa calibration aux fonctions $L$ de Dirichlet. Tous les r\'esultats sont formalis\'es en Lean~4 avec Mathlib et ne d\'ependent que des trois axiomes standard. Num\'eriquement, les 5212 valeurs calcul\'ees de $E_Q$ avec $10\le Q\le10^7$ sont comprises entre $0{,}030$ et $0{,}045$, et $E_Q$ oscille en $\log Q$ avec des fr\'equences $|\gamma\pm\gamma'|$ donn\'ees par des ordonn\'ees de z\'eros de $\zeta$. Enfin, nous composons le crit\`ere avec la biblioth\`eque Lean qui annonce une d\'emonstration de l'hypoth\`ese de Riemann (Alp\"oge, 2026), dont nous reproduisons ind\'ependamment la compilation, en la confrontant octet par octet \`a la v\'erification publi\'ee par le MIT.
 \end{abstract}
 
 \maketitle
@@ -55,6 +55,7 @@ Nous proposons dans ce travail un t\'emoin concret, dans l'espace des suites mun
 \item Th\'eor\`eme~\ref{teo:recip} : la borne inf\'erieure explicite qu'impose un z\'ero hors de la droite critique.
 \item Section~\ref{sec:equiv} : des formulations arithm\'etiques \'equivalentes et un th\'eor\`eme de barri\`ere.
 \item Section~\ref{sec:dirichlet} : l'extension aux fonctions $L(s,\chi)$ de Dirichlet.
+\item Section~\ref{sec:numerica} : une \'etude num\'erique de $E_Q$ jusqu'\`a $Q=10^7$ et de $E_{Q,\chi}$ jusqu'\`a $Q=3\cdot10^5$.
 \item Section~\ref{sec:formal} : la formalisation en Lean et la composition avec la biblioth\`eque d'Alp\"oge.
 \end{itemize}
 
@@ -164,18 +165,56 @@ L(s,\chi)=s\int_1^\infty S_\chi(\lfloor x\rfloor)\,x^{-s-1}\,dx,\qquad
 \]
 \item Si $L(\rho,\chi)=0$ avec $\Re\rho>1/2$, alors $(2\Re\rho-1)/|\rho|^2\le E_{Q,\chi}(Q+1)^{1-2\Re\rho}$ pour tout $Q$.
 \item Si $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ sur une suite non born\'ee de $Q$, alors $L(s,\chi)\ne0$ dans $\Re s>1/2$.
+\item Soit $1/2\le\theta<1$. Alors $L(s,\chi)\ne0$ dans $\Re s>\theta$ si et seulement si, pour tout $\varepsilon>0$, il existe $C$ tel que $E_{Q,\chi}\le CQ^{2\theta-1+\varepsilon}$ pour tout $Q\ge1$. En particulier, GRH pour $\chi$ \'equivaut \`a $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$.
+\item Sans hypoth\`ese, $\displaystyle\lim_{Q\to\infty}\frac{\log(2+E_{Q,\chi})}{\log Q}=2\Theta_\chi-1$, o\`u $\Theta_\chi=\sup\bigl(\{1/2\}\cup\{\Re\rho:L(\rho,\chi)=0,\ 0<\Re\rho<1\}\bigr)$.
 \end{enumerate}
 \end{teorema}
 
-L'implication r\'eciproque (GRH pour $\chi$ $\Rightarrow E_{Q,\chi}\ll Q^\varepsilon$) requiert les analogues pour $L(s,\chi)$ des bornes de la section~\ref{sec:cotas} et reste en suspens. Num\'eriquement, pour les caract\`eres modulo $3$, $4$ et $5$ et $Q\le1000$, $E_{Q,\chi}$ reste comprise entre $0{,}06$ et $0{,}44$.
+Les points (5) et (6) suivent le sch\'ema de la section~\ref{sec:cotas} ; comme $L(s,\chi)$ est enti\`ere, il n'y a pas de p\^ole \`a compenser. La borne sur la droite critique, $|L(\tfrac12+ix,\chi)|\ll(1+|x|)^{1/3}$, provient \`a nouveau du th\'eor\`eme des trois droites. Sur $\Re s=1$, une sommation d'Abel tronqu\'ee donne $|L(1+it,\chi)|\ll\log(2+|t|)$. Sur $\Re s=0$, l'\'equation fonctionnelle du caract\`ere primitif qui induit $\chi$, avec les valeurs exactes de $|\Gamma|$ sur les droites $\Re s=0,\tfrac12,1$, donne $|L(it,\chi)|\ll(1+|t|)^{1/2}\log(2+|t|)$. Les constantes implicites d\'ependent de $N$. Num\'eriquement (section~\ref{sec:numerica}), pour les caract\`eres r\'eels modulo $3$ et $4$ et un caract\`ere d'ordre $4$ modulo $5$, et pour tout $1\le Q\le1000$, $E_{Q,\chi}$ est comprise entre $0{,}0561$ et $0{,}4678$.
+
+\section{\'Etude num\'erique}\label{sec:numerica}
+
+En \'ecrivant $\{k/d\}=k/d-\lfloor k/d\rfloor$, les termes lin\'eaires du t\'emoin se compensent :
+\[
+\sigma_Q(k)=1-A_Q(k)+Qm_Q\lfloor k/Q\rfloor-\gamma_Q\,\epsilon_Q(k),\qquad
+A_Q(k)=\sum_{n\le k}c_Q(n),\quad c_Q(n)=\sum_{d\mid n,\ d\le Q}\mu(d),
+\]
+o\`u $\epsilon_Q(k)\in\{0,1\}$ est la parit\'e de $\lfloor k/Q\rfloor$. De m\^eme, $\sigma_{Q,\chi}(k)=1-\sum_{n\le k}\chi(n)c_Q(n)$. Un crible sur les multiples de chaque $d\le Q$ sans facteur carr\'e donne $c_Q(n)$ pour $n\le K$ en $O(K\log Q)$ op\'erations. Nous tronquons en $K=\max(2000Q,10^7)$ et estimons la queue $\sum_{k>K}$ par la moyenne de $|\sigma|^2$ sur $(K/2,K]$ divis\'ee par $K+1$ ; en comparant les moyennes des deux derniers quarts, l'erreur relative de la queue reste inf\'erieure \`a $10^{-4}$ dans tous les cas. Le programme co\"incide avec les d\'efinitions litt\'erales de la formalisation (diff\'erence $0$ pour $\chi$ et inf\'erieure \`a $5\cdot10^{-13}$ pour $\zeta$) et confirme dans tous les cas que le t\'emoin s'annule au d\'ebut (proposition~\ref{prop:mellin}(1) et th\'eor\`eme~\ref{teo:dirichlet}(1)).
+
+Nous avons calcul\'e $E_Q$ pour tout $2\le Q\le5000$, sur une grille de $40$ points par unit\'e de $\log Q$ jusqu'\`a $Q=10^6$, et en quelques points suppl\'ementaires jusqu'\`a $Q=10^7$ : $5220$ valeurs au total. Nous avons calcul\'e $E_{Q,\chi}$ pour les caract\`eres r\'eels modulo $3$ et $4$ et pour le caract\`ere modulo $5$ tel que $\chi(2)=i$, pour tout $1\le Q\le5000$ et sur la m\^eme grille jusqu'\`a $Q=3\cdot10^5$.
+
+\begin{center}
+\begin{tabular}{lccccccc}
+\toprule
+$Q$ & $10$ & $10^2$ & $10^3$ & $10^4$ & $10^5$ & $10^6$ & $10^7$\\
+\midrule
+$E_Q$ & $0{,}03574$ & $0{,}03794$ & $0{,}03234$ & $0{,}03529$ & $0{,}03452$ & $0{,}03438$ & $0{,}03589$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Taille de l'\'energie}
+Pour $10\le Q\le10^7$, les $5212$ valeurs calcul\'ees de $E_Q$ sont comprises entre $0{,}0304$ et $0{,}0445$, et la moyenne sur chaque d\'ecade de $Q$ est comprise entre $0{,}0356$ et $0{,}0382$, sans tendance. Pour les caract\`eres, avec $10\le Q\le3\cdot10^5$, $E_{Q,\chi}$ est dans $[0{,}0541;\,0{,}2395]$ (modulo $3$), $[0{,}0747;\,0{,}3332]$ (modulo $4$) et $[0{,}1198;\,0{,}5151]$ (modulo $5$), avec des moyennes par d\'ecade \'egalement stables. Ces donn\'ees sont compatibles avec le th\'eor\`eme~\ref{teo:theta} sous RH et sugg\`erent que $E_Q$ reste born\'ee ; elles ne prouvent rien pour des $Q$ plus grands.
+
+\subsection*{Oscillation et z\'eros}
+En fonction de $u=\log Q$, $E_Q$ varie r\'eguli\`erement \`a l'\'echelle de la grille, et son oscillation est organis\'ee par les z\'eros. Le p\'eriodogramme de Lomb--Scargle~\cite{Lomb,Scargle} des valeurs de la grille avec $30\le Q\le10^6$ a ses pics principaux en $28{,}26$, $6{,}90$, $3{,}86$ et $2{,}44$, proches de $2\gamma_1=28{,}27$, $\gamma_2-\gamma_1=6{,}89$, $\gamma_3-\gamma_2=3{,}99$ et $\gamma_5-\gamma_4=2{,}51$, o\`u $\gamma_j$ est l'ordonn\'ee du $j$-i\`eme z\'ero de $\zeta$ ; il n'y a pas de pic en $\gamma_1=14{,}13$. Un ajustement par moindres carr\'es avec des sinuso\"ides aux $15$ fr\'equences $|\gamma\pm\gamma'|\le45$ form\'ees avec les cinq premiers z\'eros explique $R^2=0{,}76$ de la variance de $E_Q$ ; pour $200$ ensembles de $15$ fr\'equences al\'eatoires, la m\'ediane est $0{,}17$ et le maximum $0{,}57$. Les trois caract\`eres se comportent de la m\^eme fa\c{c}on ($R^2=0{,}68$, $0{,}65$ et $0{,}76$, contre des maxima al\'eatoires de $0{,}57$, $0{,}56$ et $0{,}71$) ; pour le caract\`ere modulo $3$, les pics principaux sont en $\gamma_2-\gamma_1=3{,}21$, $2\gamma_1=16{,}08$ et $\gamma_1+\gamma_2=19{,}29$. Nous avons calcul\'e les ordonn\'ees des z\'eros de fa\c{c}on ind\'ependante, \`a partir de la fonction z\^eta de Hurwitz.
+
+Une heuristique l'explique, en supposant RH et les z\'eros simples. La formule de Perron et la proposition~\ref{prop:mellin}(3) donnent
+\[
+1-\zeta(s)P_Q(s)\approx\zeta(s)\sum_\rho\frac{Q^{\rho-s}}{(\rho-s)\,\zeta'(\rho)},\qquad
+E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
+\]
+une fonction presque p\'eriodique de $\log Q$. La diagonale $\rho=\rho'$ donne la valeur moyenne, et les paires $\rho\ne\rho'$ donnent les fr\'equences $\gamma-\gamma'$, qui comprennent $\gamma_i+\gamma_j$ et $2\gamma_i$ parce que les z\'eros vont par paires $\pm\gamma$. Nous ne d\'emontrons pas cette description ; elle est coh\'erente avec l'absence de croissance observ\'ee plus haut.
+
+Les programmes, les donn\'ees et les v\'erifications se trouvent dans le r\'epertoire \path{scripts/numerica_energia} du d\'ep\^ot.
 
 \section{Formalisation et composition}\label{sec:formal}
 
 Tous les \'enonc\'es pr\'ec\'edents, sauf les \'enonc\'es num\'eriques, sont d\'emontr\'es en Lean~4.33.1 avec Mathlib (r\'evision \texttt{0df444a}) :
 \begin{itemize}
 \item 26 modules pour $\zeta$ (biblioth\`eque \texttt{AMateEnergia}) ;
-\item un module pour les fonctions $L$ de Dirichlet (biblioth\`eque \texttt{AMateDirichlet}) ;
-\item un module contenant la partie alg\'ebrique du test de Miller (biblioth\`eque \texttt{AMateMiller}).
+\item huit modules pour les fonctions $L$ de Dirichlet (biblioth\`eque \texttt{AMateDirichlet}) ;
+\item 26 modules pour le test de Miller et la borne de Bach explicite (biblioth\`eque \texttt{AMateMiller}).
 \end{itemize}
 Aucun ne contient \texttt{sorry}, et la commande \texttt{\#print axioms} ne fait appara\^{\i}tre que les axiomes \texttt{propext}, \texttt{Classical.choice} et \texttt{Quot.sound}. Les th\'eor\`emes principaux ont \'et\'e accept\'es non seulement par le noyau de Lean, mais aussi par le v\'erificateur ind\'ependant \texttt{nanoda} (voir ci-dessous).
 
@@ -190,19 +229,21 @@ Le 20 novembre 2026 a \'et\'e annonc\'ee~\cite{Alpoge} une biblioth\`eque Lean (
 compile dans un seul environnement avec les trois axiomes standard.
 \item \emph{Corollaires sans hypoth\`ese.} On obtient de m\^eme, l\`a aussi avec les trois seuls axiomes standard, la borne de Littlewood $|M(n)|\le K_\delta n^{1/2+\delta}$ et $|G(y)|\le C_{\sigma}y^{\sigma}$ pour tout $\sigma>1/2$ (\path{AMate.mertens_raiz_alpoge} et \path{AMate.vonMangoldt_suavizada_alpoge}).
 \item \emph{Binaires utilis\'es dans la composition locale.} Nous avons utilis\'e une distribution tierce des 175\,187 binaires. Parmi eux, 76\,968 co\"{\i}ncident octet par octet avec la liste du MIT. Les 98\,219 restants sont exactement ceux qui contiennent le chemin de compilation de cette distribution : aucun des binaires identiques ne le contient, et tous les binaires diff\'erents le contiennent.
-\item \emph{V\'erification par un noyau ind\'ependant.} Nous avons export\'e avec \texttt{lean4export} la cl\^oture des th\'eor\`emes principaux des trois biblioth\`eques : 67\,319 d\'eclarations, Mathlib comprise. Le v\'erificateur ind\'ependant \texttt{nanoda} les accepte toutes, et l'exportation ne contient que les axiomes \texttt{propext}, \texttt{Quot.sound} et \texttt{Classical.choice}. Quant \`a la partie d'Alp\"oge (\texttt{riemannHypothesis}), elle a \'et\'e v\'erifi\'ee par le MIT avec plusieurs noyaux ind\'ependants~\cite{MIT}.
+\item \emph{V\'erification par un noyau ind\'ependant.} Nous avons export\'e avec \texttt{lean4export} la cl\^oture des th\'eor\`emes principaux des trois biblioth\`eques : 76\,387 d\'eclarations, Mathlib comprise. Le v\'erificateur ind\'ependant \texttt{nanoda} les accepte toutes, et l'exportation ne contient que les axiomes \texttt{propext}, \texttt{Quot.sound} et \texttt{Classical.choice}. Quant \`a la partie d'Alp\"oge (\texttt{riemannHypothesis}), elle a \'et\'e v\'erifi\'ee par le MIT avec plusieurs noyaux ind\'ependants~\cite{MIT}.
 \end{itemize}
 
 \subsection*{Test de Miller}
-Comme premi\`ere cons\'equence de GRH, nous formalisons la partie alg\'ebrique du test de Miller (biblioth\`eque \texttt{AMateMiller}) :
+Comme cons\'equence de GRH, nous formalisons le test de Miller (biblioth\`eque \texttt{AMateMiller}) :
 \begin{itemize}
 \item si $p$ est premier, toute unit\'e modulo $p$ est un menteur fort ;
 \item si $n\ge3$ est impair et compos\'e, les menteurs forts sont contenus dans un sous-groupe propre de $(\mathbb Z/n\mathbb Z)^\times$.
 \end{itemize}
-Par cons\'equent, pour tout $B$ tel que tout sous-groupe propre de $(\mathbb Z/n\mathbb Z)^\times$ omette une unit\'e repr\'esent\'ee par un entier $a\le B(n)$, le test de Miller avec les bases $a\le B(n)$ est correct. Bach a d\'emontr\'e, en supposant GRH, que $B(n)=2(\log n)^2$ convient ; formaliser cette borne est l'\'etape qui manque pour disposer d'un test de primalit\'e d\'eterministe v\'erifi\'e.
+Tout sous-groupe propre $H$ est contenu dans le noyau d'un caract\`ere de Dirichlet non principal, par dualit\'e pour le groupe ab\'elien fini $(\mathbb Z/n\mathbb Z)^\times/H$. Par cons\'equent, si tout caract\`ere non principal modulo $n$ prend une valeur diff\'erente de $1$ en un certain $a\le B(n)$ premier \`a $n$, le test de Miller avec les bases $a\le B(n)$ est correct. Le test est ex\'ecutable en Lean (\texttt{esPrimoMiller}, avec une exponentiation modulaire rapide), et \texttt{esPrimoMiller\_correcto} d\'emontre qu'il d\'ecide la primalit\'e pour tout tel $B$ ; avec $B(n)=n$ l'hypoth\`ese est trivialement v\'erifi\'ee. En supposant GRH, la formule explicite tronqu\'ee pour $\psi(x,\chi)$ et la borne du nombre de z\'eros dans des fen\^etres de hauteur $1$, nous d\'emontrons que $B(n)=\lfloor K(1+\log n)^4\rfloor$ convient pour une certaine constante $K$ ; la formule explicite appliqu\'ee au caract\`ere trivial modulo $1$ fournit la minoration de $\psi(x)$. En int\'egrant la formule explicite sur $[x/2,x]$, l'exposant descend \`a $2$ : $B(n)=\lfloor K(1+\log n)^2\rfloor$ convient aussi. La biblioth\`eque d'Alp\"oge d\'emontre ces trois ingr\'edients. Sa composition avec ces r\'esultats donne des tests de Miller d\'eterministes avec $O((\log n)^4)$ et $O((\log n)^2)$ bases, sans hypoth\`ese, et la composition avec le th\'eor\`eme~\ref{teo:dirichlet}(5) donne $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$ pour tout $\chi$ non principal. Les deux compositions sont \'ecrites et v\'erifi\'ees contre des copies litt\'erales des \'enonc\'es qu'elles utilisent ; il reste \`a les compiler avec la biblioth\`eque d'Alp\"oge.
+
+Ces constantes $K$ ne sont pas explicites. Pour obtenir un test certifi\'e, nous d\'emontrons aussi la borne de Bach avec constante explicite (\texttt{cota\_bach\_explicita}). Nous supposons GRH et plusieurs \'enonc\'es analytiques de la biblioth\`eque d'Alp\"oge : la formule de Cauchy sur les rectangles, la localisation et la finitude des z\'eros, la partie r\'eguli\`ere et l'\'equation fonctionnelle de $L'/L$, des bornes de la fonction digamma, de bonnes hauteurs et la s\'erie de la digamma. Alors, si $\log n\ge 64$, tout caract\`ere non principal modulo $n$ prend une valeur diff\'erente de $1$ en un certain $a\le 2(\log n)^2$ premier \`a $n$. La d\'emonstration utilise le noyau $x^s/((s+\alpha)(s+\beta))$ avec $\alpha=2/5$, $\beta=9/20$ et $x=2(\log n)^2$, la formule explicite pond\'er\'ee pour le caract\`ere primitif associ\'e et pour $\zeta$, une borne de type Hadamard pour la somme sur les z\'eros, et des bornes explicites du bord gauche, des r\'esidus et des puissances des nombres premiers qui divisent $n$. Par cons\'equent, le test avec $(\lfloor\log_2 n\rfloor+1)^2$ bases pour $n\ge 2^{93}$, et avec toutes les bases $a\le n$ pour $n<2^{93}$, d\'ecide la primalit\'e (\texttt{esPrimoMiller\_explicito}) et s'ex\'ecute en Lean. Ces \'enonc\'es sont instanci\'es par les th\'eor\`emes d'Alp\"oge dans un fichier qui n'importe pas le module principal de cette biblioth\`eque ; nous l'avons compil\'e contre elle, et il n'utilise que les trois axiomes standard. Avec la GRH de cette biblioth\`eque, le test vaut sans hypoth\`ese, dans une composition qui reste \`a compiler.
 
 \begin{observacion}
-La v\'erification formelle garantit que le noyau de Lean accepte les d\'emonstrations. Elle ne remplace pas la relecture math\'ematique humaine de la d\'emonstration d'Alp\"oge, qui, selon les informations publiques, n'est pas achev\'ee. Les r\'esultats des sections 2--6 n'en d\'ependent pas.
+La v\'erification formelle garantit que le noyau de Lean accepte les d\'emonstrations. Elle ne remplace pas la relecture math\'ematique humaine de la d\'emonstration d'Alp\"oge, qui, selon les informations publiques, n'est pas achev\'ee. Les r\'esultats des sections 2--7 n'en d\'ependent pas.
 \end{observacion}
 
 \section{Travaux connexes et port\'ee}
@@ -223,8 +264,10 @@ Nous ne connaissons pas de formalisations ant\'erieures de crit\`eres de ce type
 \bibitem{Beurling} A.~Beurling, \emph{A closure problem related to the Riemann zeta-function}, Proc.\ Nat.\ Acad.\ Sci.\ USA 41 (1955), 312--314.
 \bibitem{BCF} S.~Bettin, J.~B.~Conrey, D.~W.~Farmer, \emph{An optimal choice of Dirichlet polynomials for the Nyman--Beurling criterion}, Proc.\ Steklov Inst.\ Math.\ 280 (2013), suppl.~2, S30--S36. {\NoAutoSpacing arXiv:1211.5191}.
 \bibitem{Burnol} J.-F.~Burnol, \emph{A lower bound in an approximation problem involving the zeros of the Riemann zeta function}, Adv.\ Math.\ 170 (2002), n\textsuperscript{o}~1, 56--70. {\NoAutoSpacing arXiv:math/0103058}.
+\bibitem{Lomb} N.~R.~Lomb, \emph{Least-squares frequency analysis of unequally spaced data}, Astrophys.\ Space Sci.\ 39 (1976), 447--462.
 \bibitem{MIT} A.~Sutherland, \emph{Verification files for the Lean proof of the Riemann Hypothesis}, \url{https://math.mit.edu/~drew/grh/}, consult\'e le 23 novembre 2026.
 \bibitem{Nyman} B.~Nyman, \emph{On some groups and semigroups of translations}, th\`ese, Uppsala, 1950.
+\bibitem{Scargle} J.~D.~Scargle, \emph{Studies in astronomical time series analysis.~II. Statistical aspects of spectral analysis of unevenly spaced data}, Astrophys.\ J.\ 263 (1982), 835--853.
 \end{thebibliography}
 
 \end{document}

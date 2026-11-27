@@ -10,7 +10,8 @@
 # Usage, from the repository root, after `lake build`:
 #   LEAN4EXPORT=/path/to/lean4export NANODA=/path/to/nanoda_bin scripts/verificar_con_nanoda.sh
 #
-# The export is about 540 MB. nanoda used 8 threads and took about 11 s on 2026-11-23.
+# The export is about 690 MB. On 2026-11-27 the export plus the nanoda check (8 threads)
+# took about 48 s.
 set -euo pipefail
 : "${LEAN4EXPORT:?set LEAN4EXPORT to the lean4export binary}"
 : "${NANODA:?set NANODA to the nanoda_bin binary}"
@@ -25,7 +26,16 @@ AMate.cota_incondicional_S_hiperbolica AMate.M_moebius_bound_theta AMate.cota_G_
 AMate.E_le_lineal AMate.zeta_ofReal_ne_zero AMate.obstaculo_cauchy_paridad_409 AMate.cota_inferior_energia_cero
 AMate.Dirichlet.cota_inferior_energia_cero AMate.Dirichlet.LFunction_ne_zero_de_energia_cofinal
 AMate.Dirichlet.integral_sigma_floor AMate.Dirichlet.LFunction_eq_integral
-AMate.Miller.test_miller_correcto AMate.Miller.mentirosos_en_subgrupo_propio AMate.Miller.primo_todos_mentirosos"
+AMate.Dirichlet.E_eq_integral AMate.Dirichlet.L_recta_critica AMate.Dirichlet.P_recta_critica_L
+AMate.Dirichlet.energia_cota_theta_L AMate.Dirichlet.sin_ceros_iff_energia_theta_L
+AMate.Dirichlet.sin_ceros_iff_energia_cofinal_theta_L AMate.Dirichlet.grh_iff_energia_subpolinomial
+AMate.Dirichlet.Theta_L_eq_half_iff AMate.Dirichlet.tendsto_log_energia_div_log_L
+AMate.Miller.test_miller_correcto AMate.Miller.mentirosos_en_subgrupo_propio AMate.Miller.primo_todos_mentirosos
+AMate.Miller.cotaSubgruposPropios_of_cotaCaracteres AMate.Miller.esPrimoMiller_correcto
+AMate.Miller.esPrimoMiller_id_correcto AMate.Miller.cota_caracteres_de_grh' AMate.Miller.esPrimoMiller_de_grh
+AMate.Miller.cota_caracteres_de_grh_cuad' AMate.Miller.esPrimoMiller_de_grh_cuad
+AMate.Miller.Explicito.cota_bach_explicita AMate.Miller.cotaCaracteres_basesExplicitas
+AMate.Miller.esPrimoMiller_explicito"
 
 # shellcheck disable=SC2086
 lake env "$LEAN4EXPORT" AMateEnergia AMateDirichlet AMateMiller -- $DECL > "$OUT/amate.ndjson"
@@ -47,7 +57,14 @@ cat > "$OUT/nanoda_config.json" <<EOF
         "AMate.rh_iff_energia_cofinal",
         "AMate.energia_subpolinomial",
         "AMate.Dirichlet.LFunction_ne_zero_de_energia_cofinal",
-        "AMate.Miller.test_miller_correcto"
+        "AMate.Dirichlet.grh_iff_energia_subpolinomial",
+        "AMate.Dirichlet.tendsto_log_energia_div_log_L",
+        "AMate.Miller.test_miller_correcto",
+        "AMate.Miller.esPrimoMiller_correcto",
+        "AMate.Miller.esPrimoMiller_de_grh",
+        "AMate.Miller.esPrimoMiller_de_grh_cuad",
+        "AMate.Miller.Explicito.cota_bach_explicita",
+        "AMate.Miller.esPrimoMiller_explicito"
     ],
     "pp_output_path": "$OUT/enunciados_nanoda.txt",
     "pp_to_stdout": false,

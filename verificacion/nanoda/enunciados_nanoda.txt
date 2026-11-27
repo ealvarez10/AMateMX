@@ -40,12 +40,80 @@ theorem AMate.Dirichlet.LFunction_ne_zero_de_energia_cofinal :
     (DirichletCharacter.LFunction χ s) (OfNat.ofNat 0)) :=
   _
 
+theorem AMate.Dirichlet.grh_iff_energia_subpolinomial :
+  forall {N : Nat} [inst._@.AMateDirichlet.Calibracion.3541848536._hygCtx._hyg.5 : NeZero N]
+    {χ : DirichletCharacter Complex N},
+  Ne χ (OfNat.ofNat 1) → Iff
+    (forall (s : Complex),
+    LT.lt (HDiv.hDiv (OfNat.ofNat 1) (OfNat.ofNat 2)) (Complex.re s) → Ne
+      (DirichletCharacter.LFunction χ s) (OfNat.ofNat 0))
+    (forall (ε : Real),
+    LT.lt (OfNat.ofNat 0) ε → Exists
+      (fun (C : Real) =>
+      forall (Q : Nat),
+      LE.le (OfNat.ofNat 1) Q → LE.le (AMate.Dirichlet.E χ Q)
+        (HMul.hMul C (HPow.hPow (Nat.cast Q) ε)))) :=
+  _
+
+theorem AMate.Dirichlet.tendsto_log_energia_div_log_L :
+  forall {N : Nat} [inst._@.AMateDirichlet.Calibracion.1859894277._hygCtx._hyg.5 : NeZero N]
+    {χ : DirichletCharacter Complex N},
+  Ne χ (OfNat.ofNat 1) → Filter.Tendsto
+    (fun (Q : Nat) =>
+    HDiv.hDiv (Real.log (HAdd.hAdd (OfNat.ofNat 2) (AMate.Dirichlet.E χ Q)))
+      (Real.log (Nat.cast Q))) Filter.atTop
+    (nhds (HSub.hSub (HMul.hMul (OfNat.ofNat 2) (AMate.Dirichlet.Theta_L χ)) (OfNat.ofNat 1))) :=
+  _
+
 theorem AMate.Miller.test_miller_correcto :
   forall {B : Nat → Nat},
   AMate.Miller.CotaSubgruposPropios B → (forall {n : Nat},
   LE.le (OfNat.ofNat 3) n → Odd n → Iff (Nat.Prime n)
     (forall (a : Nat),
     LE.le a (B n) → Nat.Coprime a n → AMate.Miller.MentirosoFuerte n (Nat.cast a))) :=
+  _
+
+theorem AMate.Miller.esPrimoMiller_correcto :
+  forall {B : Nat → Nat},
+  AMate.Miller.CotaSubgruposPropios B → (forall (n : Nat),
+  Iff (Eq (AMate.Miller.esPrimoMiller B n) Bool.true) (Nat.Prime n)) :=
+  _
+
+theorem AMate.Miller.esPrimoMiller_de_grh (hEF : AMate.Miller.PI.ExplicitFormula)
+  (hZW : AMate.Miller.PI.ZerosWindow) (hGRH : AMate.Miller.GRHPrimitivo) :
+  Exists
+    (fun (K : Real) =>
+    And (LT.lt (OfNat.ofNat 0) K)
+      (forall (n : Nat),
+      Iff (Eq (AMate.Miller.esPrimoMiller (AMate.Miller.basesBach K) n) Bool.true)
+        (Nat.Prime n))) :=
+  _
+
+theorem AMate.Miller.esPrimoMiller_de_grh_cuad (hEF : AMate.Miller.PI.ExplicitFormula)
+  (hZW : AMate.Miller.PI.ZerosWindow) (hGRH : AMate.Miller.GRHPrimitivo) :
+  Exists
+    (fun (K : Real) =>
+    And (LT.lt (OfNat.ofNat 0) K)
+      (forall (n : Nat),
+      Iff (Eq (AMate.Miller.esPrimoMiller (AMate.Miller.basesBach2 K) n) Bool.true)
+        (Nat.Prime n))) :=
+  _
+
+theorem AMate.Miller.Explicito.cota_bach_explicita (h : AMate.Miller.Hadamard.HipHadamard)
+  (hS : AMate.Miller.PI.Digamma.SerieDigamma) (hG : AMate.Miller.GRHPrimitivo) (n : Nat)
+  (a._@._internal._hyg.0 : LE.le (OfNat.ofNat 64) (Real.log (Nat.cast n)))
+  (χ : DirichletCharacter Complex n) (a._@._internal._hyg.0 : Ne χ (OfNat.ofNat 1)) :
+  Exists
+    (fun (a : Nat) =>
+    And
+      (LE.le (Nat.cast a)
+        (HMul.hMul (OfNat.ofNat 2) (HPow.hPow (Real.log (Nat.cast n)) (OfNat.ofNat 2))))
+      (And (Nat.Coprime a n) (Ne (DFunLike.coe χ (Nat.cast a)) (OfNat.ofNat 1)))) :=
+  _
+
+theorem AMate.Miller.esPrimoMiller_explicito (h : AMate.Miller.Hadamard.HipHadamard)
+  (hS : AMate.Miller.PI.Digamma.SerieDigamma) (hG : AMate.Miller.GRHPrimitivo) (n : Nat) :
+  Iff (Eq (AMate.Miller.esPrimoMiller AMate.Miller.basesExplicitas n) Bool.true) (Nat.Prime n) :=
   _
 
 axiom propext {a b : Prop} : Iff a b → Eq a b
