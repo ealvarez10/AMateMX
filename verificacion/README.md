@@ -24,9 +24,9 @@ The full result archive (34 MB, with the hash of every module and the build logs
 
 The main theorems of `AMateEnergia`, `AMateDirichlet` and `AMateMiller` were exported with `lean4export` and checked by `nanoda`:
 
-- **Export:** the main theorems with all their dependencies, Mathlib included. It was 691,584,762 bytes; its SHA-256 is in [amate.ndjson.sha256](nanoda/amate.ndjson.sha256).
+- **Export:** the main theorems with all their dependencies, Mathlib included. It was 695,923,588 bytes; its SHA-256 is in [amate.ndjson.sha256](nanoda/amate.ndjson.sha256).
 - **Tool versions:** `lean4export` tag v4.33.0 (commit `15f6055`), built with Lean 4.33.1, and `nanoda_lib` commit `0da9f98` (v0.4.32).
-- **Result:** "Checked 76636 declarations with no errors" ([nanoda_salida.txt](nanoda/nanoda_salida.txt)). Only `propext`, `Quot.sound` and `Classical.choice` were permitted, and they are the only axioms in the export.
+- **Result:** "Checked 77350 declarations with no errors" ([nanoda_salida.txt](nanoda/nanoda_salida.txt)). Only `propext`, `Quot.sound` and `Classical.choice` were permitted, and they are the only axioms in the export.
 - **Statements:** the statements printed by nanoda match the Lean sources ([enunciados_nanoda.txt](nanoda/enunciados_nanoda.txt)).
 
 To reproduce it, see [../scripts/verificar_con_nanoda.sh](../scripts/verificar_con_nanoda.sh).
@@ -39,4 +39,4 @@ Result ([composiciones_resultado.txt](reproduccion_vm/composiciones_resultado.tx
 
 ## `composicion_local/`: certified test for every n (28 November 2026)
 
-`AMateConAlpoge/CertificadoAlpoge.lean` (the certified Miller test for every n and the least quadratic non-residue, with no hypothesis) was written after the virtual-machine run. It was compiled locally, in about 15 minutes, against the binaries of Alpöge's library used for the local composition, and its three theorems depend only on `propext`, `Classical.choice` and `Quot.sound` ([certificado_alpoge.txt](composicion_local/certificado_alpoge.txt)). `amate_composiciones_vm.sh` now also compiles it, so a new run of that script would check it on a rebuilt library.
+`AMateConAlpoge/CertificadoAlpoge.lean` (the certified Miller test for every n and the least quadratic non-residue, with no hypothesis) was written after the virtual-machine run. It was compiled locally, in about 20 minutes, against the binaries of Alpöge's library used for the local composition, and its four theorems (among them `AMate.Miller.esPrimo_alpoge`, for the program `amate-primo`) depend only on `propext`, `Classical.choice` and `Quot.sound`. After `AMateMiller/BachExplicito.lean` was simplified (the constant-2 bound now follows from the general inequality, with the same statement), `MillerAlpoge.lean` was also compiled again locally, with the same six axiom lists ([certificado_alpoge.txt](composicion_local/certificado_alpoge.txt)). `amate_composiciones_vm.sh` now also compiles it, so a new run of that script would check it on a rebuilt library.

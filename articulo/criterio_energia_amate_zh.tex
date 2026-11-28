@@ -230,7 +230,7 @@ E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
 \begin{itemize}
 \item 关于 $\zeta$ 的 26 个模块（库 \texttt{AMateEnergia}）；
 \item 关于狄利克雷 $L$ 函数的八个模块（库 \texttt{AMateDirichlet}）；
-\item 关于米勒检验与显式 Bach 界的 28 个模块（库 \texttt{AMateMiller}）。
+\item 关于米勒检验与显式 Bach 界的 31 个模块（库 \texttt{AMateMiller}）。
 \end{itemize}
 这些模块均不含 \texttt{sorry}，且 \texttt{\#print axioms} 只列出 \texttt{propext}、\texttt{Classical.choice} 和 \texttt{Quot.sound}。除 Lean 内核之外，主要定理还被独立验证器 \texttt{nanoda} 接受（见下文）。
 
@@ -245,7 +245,7 @@ E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
 在单一环境中编译通过，且只依赖三条标准公理。
 \item \emph{无条件推论。}同理可得李特尔伍德界 $|M(n)|\le K_\delta n^{1/2+\delta}$，以及对所有 $\sigma>1/2$ 成立的 $|G(y)|\le C_{\sigma}y^{\sigma}$（\path{AMate.mertens_raiz_alpoge} 与 \path{AMate.vonMangoldt_suavizada_alpoge}），它们同样只依赖三条标准公理。
 \item \emph{本地组合所用的二进制文件。}我们使用了这 175\,187 个二进制文件的一个第三方发行版。其中 76\,968 个与 MIT 的列表逐字节一致；其余 98\,219 个恰好是包含该发行版编译路径的那些文件：一致的文件都不包含该路径，而不一致的文件全都包含。
-\item \emph{用独立内核复核。}我们用 \texttt{lean4export} 导出了三个库中主要定理的依赖闭包：共 76\,636 条声明，Mathlib 也包括在内。独立验证器 \texttt{nanoda} 接受了全部声明，且导出内容只包含公理 \texttt{propext}、\texttt{Quot.sound} 和 \texttt{Classical.choice}。Alp\"oge 的部分（\texttt{riemannHypothesis}）已由 MIT 用多个独立内核复核~\cite{MIT}。
+\item \emph{用独立内核复核。}我们用 \texttt{lean4export} 导出了三个库中主要定理的依赖闭包：共 77\,350 条声明，Mathlib 也包括在内。独立验证器 \texttt{nanoda} 接受了全部声明，且导出内容只包含公理 \texttt{propext}、\texttt{Quot.sound} 和 \texttt{Classical.choice}。Alp\"oge 的部分（\texttt{riemannHypothesis}）已由 MIT 用多个独立内核复核~\cite{MIT}。
 \end{itemize}
 
 \subsection*{米勒检验}
@@ -258,7 +258,7 @@ E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
 
 这些常数 $K$ 都不是显式的。为了得到经认证的检验，我们还证明了带显式常数的 Bach 界（\texttt{cota\_bach\_explicita}）。我们假设 GRH 以及 Alp\"oge 库中的若干分析命题：矩形上的柯西公式、零点的位置与有限性、$L'/L$ 的正则部分与函数方程、双伽马函数的界、好高度，以及双伽马函数的级数表示。于是，若 $\log n\ge 64$，则模 $n$ 的每个非主特征都在某个与 $n$ 互素的 $a\le 2(\log n)^2$ 处取不等于 $1$ 的值。证明使用核 $x^s/((s+\alpha)(s+\beta))$，其中 $\alpha=2/5$、$\beta=9/20$、$x=2(\log n)^2$；还用到关联本原特征与 $\zeta$ 的加权显式公式、零点和的 Hadamard 型界，以及左边界、留数和整除 $n$ 的素数之幂的显式界。因此，对 $n\ge 2^{93}$ 使用 $(\lfloor\log_2 n\rfloor+1)^2$ 个底、对 $n<2^{93}$ 使用全部底 $a\le n$ 的检验能判定素性（\texttt{esPrimoMiller\_explicito}），并可在 Lean 中运行。上述命题在一个不导入该库主模块的文件中由 Alp\"oge 的定理实例化；我们已将该文件与该库一起编译，它只用到三个标准公理。再用该库中的 GRH，检验即无需任何假设（\texttt{esPrimoMiller\_explicito\_alpoge}）；这一组合同样已编译通过，只用到三个标准公理。
 
-同样的方法取 $x=c(\log n)^2$ 并用更大的常数，可以降低门槛：$c=16$ 时只需 $\log n\ge 8.3$，$c=4$ 时只需 $\log n\ge 23.5$（\texttt{cota\_bach\_16}、\texttt{cota\_bach\_4}）。结合这三个区间，只在 $n<4096$ 时使用全部底、在其上分别使用 $8(\lfloor\log_2 n\rfloor+1)^2$、$2(\lfloor\log_2 n\rfloor+1)^2$ 或 $(\lfloor\log_2 n\rfloor+1)^2$ 个底的检验，对所有 $n$ 都能判定素性（\texttt{esPrimoMiller\_certificado}）。作为 Bach 界的经典应用，每个满足 $\log p\ge 8.3$ 的奇素数 $p$ 都有一个二次非剩余 $a\le 16(\log p)^2$，而当 $\log p\ge 64$ 时有一个 $a\le 2(\log p)^2$（\texttt{noResiduo\_16}、\texttt{noResiduo\_explicito}）。与 Alp\"oge 的库组合后，这两个结果都无需任何假设；该组合已用上文所述的二进制文件在本地编译通过，只用到三个标准公理。
+同样的方法取 $x=c(\log n)^2$ 并用更大的常数，可以降低门槛：$c=16$ 时只需 $\log n\ge 8.3$，$c=4$ 时只需 $\log n\ge 23.5$（\texttt{cota\_bach\_16}、\texttt{cota\_bach\_4}）。结合这三个区间，只在 $n<4096$ 时使用全部底、在其上分别使用 $8(\lfloor\log_2 n\rfloor+1)^2$、$2(\lfloor\log_2 n\rfloor+1)^2$ 或 $(\lfloor\log_2 n\rfloor+1)^2$ 个底的检验，对所有 $n$ 都能判定素性（\texttt{esPrimoMiller\_certificado}）。作为 Bach 界的经典应用，每个满足 $\log p\ge 8.3$ 的奇素数 $p$ 都有一个二次非剩余 $a\le 16(\log p)^2$，而当 $\log p\ge 64$ 时有一个 $a\le 2(\log p)^2$（\texttt{noResiduo\_16}、\texttt{noResiduo\_explicito}）。与 Alp\"oge 的库组合后，这两个结果都无需任何假设；该组合已用上文所述的二进制文件在本地编译通过，只用到三个标准公理。由同一观察（$(\mathbb Z/n\mathbb Z)^\times$ 的每个真子群都缺少某个小元素），我们还得到 $(\mathbb Z/n\mathbb Z)^\times$ 的小生成元、小的 $k$ 次幂非剩余以及确定性的 Solovay--Strassen 检验；程序 \texttt{amate-primo} 计算经认证的检验，并有定理证明二者一致。另有一篇短文更详细地介绍这一部分。
 
 \begin{observacion}
 形式化验证保证的是 Lean 内核接受这些证明。它不能取代对 Alp\"oge 证明的人工数学审查；据公开信息，这一审查尚未完成。第 2--7 节的结果不依赖于该证明。

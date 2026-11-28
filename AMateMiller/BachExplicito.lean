@@ -7,13 +7,16 @@ import AMateMiller.Comparacion
 (`HipHadamard`, `ReflexionLogDeriv`, `SerieDigamma`): si `log n ≥ 64`, todo carácter `χ ≠ 1`
 módulo `n` cumple `χ(a) ≠ 1` para algún `a ≤ 2 (log n)²` coprimo con `n`.
 
-Con `x = 2 (log n)²`, `α = 2/5`, `β = 9/20` y el peso `w`: si `χ(a) = 1` para todo `a ≤ x`
-coprimo con `n`, la fórmula explícita (`cota_S`) para `χ*` y para `ζ`, junto con la cota de
-Hadamard, los residuos, el lado izquierdo y las potencias de primos que dividen a `n`, da
+**Desigualdad principal** (`desigualdad_bach`), para todo `x ≥ 1`. Con `α = 2/5`, `β = 9/20`
+y el peso `w`: si `χ(a) = 1` para todo `a ≤ x` coprimo con `n`, la fórmula explícita (`cota_S`)
+para `χ*` y para `ζ`, junto con la cota de Hadamard, los residuos, el lado izquierdo y las potencias
+de primos que dividen a `n`, da
 
-  `x/((1 + α)(1 + β)) ≤ 0.765 L² + 11.45 L + 96`  (`L = log n`),
+  `100 x/203 ≤ (√x/2)(…ℓ…) + x^{-1/2}(10ℓ + 672.9) + ℓ D(x) + 24 X'(x) + 51.3 + 4.01 L + 13.27 (L − ℓ)`
 
-imposible para `L ≥ 64`.
+con `L = log n`, `ℓ = log q` (`q` el conductor), `D(x) = 20(x^{-2/5} − x^{-9/20})` y
+`X'(x) = 20(x^{-2/5} + x^{-9/20})`. Con `x = 2 L²` es imposible para `L ≥ 64` (`aritmetica_final`).
+`BachGeneral.lean` usa la misma desigualdad con `x = 16 L²` y `x = 4 L²`.
 -/
 
 open Complex MeasureTheory Filter Topology Set
@@ -47,35 +50,6 @@ theorem aritmetica_final {L ℓ r Zs Zz LE Rd E E' : ℝ} (hL : 64 ≤ L) (hℓ0
   have h4 : 0 ≤ (L - 64) ^ 2 := sq_nonneg _
   have h5 : 0 ≤ L - 64 := by linarith
   nlinarith
-
-/-- `x^{2/5} ≥ 32` para `x ≥ 2^{13}`. -/
-theorem rpow_dos_quintos_ge {x : ℝ} (hx : 8192 ≤ x) : 32 ≤ x ^ (2 / 5 : ℝ) := by
-  have h : (32 : ℝ) = (2 ^ (25 / 2 : ℝ)) ^ (2 / 5 : ℝ) := by
-    rw [← Real.rpow_mul (by norm_num)]; norm_num
-  rw [h]
-  apply Real.rpow_le_rpow (by positivity) _ (by norm_num)
-  have : (2 : ℝ) ^ (25 / 2 : ℝ) ≤ 2 ^ (13 : ℝ) :=
-    Real.rpow_le_rpow_of_exponent_le (by norm_num) (by norm_num)
-  have e : (2 : ℝ) ^ (13 : ℝ) = 8192 := by norm_num
-  linarith
-
-/-- `D ≤ 0.625` y `24 X' ≤ 30` para `x ≥ 8192`. -/
-theorem cotas_D_X {x : ℝ} (hx : 8192 ≤ x) :
-    (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ))) / (9 / 20 - 2 / 5) ≤ 625 / 1000 ∧
-      0 ≤ (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ))) / (9 / 20 - 2 / 5) ∧
-      24 * ((x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ))) / (9 / 20 - 2 / 5)) ≤ 30 := by
-  have hx0 : 0 < x := by linarith
-  have h32 := rpow_dos_quintos_ge hx
-  have ha : x ^ (-(2 / 5 : ℝ)) ≤ 1 / 32 := by
-    rw [Real.rpow_neg hx0.le, ← one_div]
-    exact one_div_le_one_div_of_le (by norm_num) h32
-  have hb : x ^ (-(9 / 20 : ℝ)) ≤ x ^ (-(2 / 5 : ℝ)) :=
-    Real.rpow_le_rpow_of_exponent_le (by linarith) (by norm_num)
-  have hb0 : 0 < x ^ (-(9 / 20 : ℝ)) := Real.rpow_pos_of_pos hx0 _
-  refine ⟨?_, ?_, ?_⟩
-  · rw [div_le_iff₀ (by norm_num)]; linarith
-  · apply div_nonneg (by linarith) (by norm_num)
-  · rw [mul_div_assoc', div_le_iff₀ (by norm_num)]; linarith
 
 /-- `√(2 L²) = √2 · L`. -/
 theorem sqrt_dos_L {L : ℝ} (hL : 0 ≤ L) : Real.sqrt (2 * L ^ 2) = Real.sqrt 2 * L := by
@@ -166,42 +140,30 @@ theorem coprime_iff_minFac {m n : ℕ} (hm : IsPrimePow m) :
   rw [hpk] at hiff
   rw [hiff, Nat.Prime.coprime_iff_not_dvd hp]
 
-/-- Aritmética del lado izquierdo. -/
-theorem cota_LE_num {t L A B V P : ℝ} (hL : 64 ≤ L) (ht0 : 0 ≤ t)
-    (htL : t * L * (141421 / 100000) ≤ 1) (hA : A ≤ L + 139 / 100) (hB : B ≤ 139 / 100)
-    (hV : V ≤ 3) (hP : P ≤ 255 / 100) :
+/-- Aritmética del lado izquierdo, para `x` cualquiera. -/
+theorem cota_LE_gen {t ℓ A B V P : ℝ} (ht0 : 0 ≤ t) (hA : A ≤ ℓ + 139 / 100)
+    (hB : B ≤ 139 / 100) (hV : V ≤ 3) (hP : P ≤ 255 / 100) :
     t * ((A + 17 + V + 12) / (2 * (1 / 2 - 9 / 20)) + P) +
-      t * ((B + 17 + V + 12) / (2 * (1 / 2 - 9 / 20)) + P) ≤ 1460 / 100 := by
+      t * ((B + 17 + V + 12) / (2 * (1 / 2 - 9 / 20)) + P) ≤ t * (10 * ℓ + 6729 / 10) := by
   have e : ∀ u : ℝ, (u + 17 + V + 12) / (2 * (1 / 2 - 9 / 20)) = 10 * (u + 29 + V) :=
     fun u => by ring
-  rw [e, e]
-  have h1 : t * (10 * (A + 29 + V) + P) ≤ t * (10 * (L + 139 / 100 + 32) + 255 / 100) :=
-    mul_le_mul_of_nonneg_left (by linarith) ht0
-  have h2 : t * (10 * (B + 29 + V) + P) ≤ t * (10 * (139 / 100 + 32) + 255 / 100) :=
-    mul_le_mul_of_nonneg_left (by linarith) ht0
-  have h3 : t * 64 ≤ t * L := mul_le_mul_of_nonneg_left hL ht0
-  linarith
+  rw [e, e, ← mul_add]
+  exact mul_le_mul_of_nonneg_left (by linarith) ht0
 
-/-- **Cota de Bach con constante explícita.** Bajo GRH y las hipótesis analíticas de Alpöge, si
-`log n ≥ 64`, todo carácter `χ ≠ 1` módulo `n` toma un valor `≠ 1` en algún `a ≤ 2 (log n)²`
-coprimo con `n`. -/
-theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimitivo) :
-    ∀ n : ℕ, 64 ≤ Real.log n → ∀ χ : DirichletCharacter ℂ n, χ ≠ 1 →
-      ∃ a : ℕ, (a : ℝ) ≤ 2 * Real.log n ^ 2 ∧ Nat.Coprime a n ∧ χ a ≠ 1 := by
-  intro n hn χ hχ
-  by_contra hcon
-  push Not at hcon
-  have hn1 : 1 ≤ n := Nat.pos_of_ne_zero fun h0 => by
-    rw [h0, Nat.cast_zero, Real.log_zero] at hn; linarith
+/-- **Desigualdad principal** para todo `x ≥ 1`. -/
+theorem desigualdad_bach (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimitivo) {n : ℕ}
+    (hn1 : 1 ≤ n) {χ : DirichletCharacter ℂ n} (hχ : χ ≠ 1) {x : ℝ} (hx1 : 1 ≤ x)
+    (hcon : ∀ a : ℕ, (a : ℝ) ≤ x → Nat.Coprime a n → χ a = 1) :
+    100 / 203 * x ≤
+      Real.sqrt x / 2 * ((Real.log χ.conductor + 43287 / 10000) * (5 / 9) +
+          (Real.log χ.conductor + 37738 / 10000) * (10 / 19) + 52434 / 10000) +
+        x ^ (-(1 / 2 : ℝ)) * (10 * Real.log χ.conductor + 6729 / 10) +
+        (Real.log χ.conductor * (20 * (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ)))) +
+          24 * (20 * (x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ))))) +
+        (513 / 10 + 401 / 100 * Real.log n) +
+        1327 / 100 * (Real.log n - Real.log χ.conductor) := by
   have : NeZero n := ⟨by omega⟩
-  have hL0 : 0 ≤ Real.log n := by linarith
-  obtain ⟨x, hxdef⟩ : ∃ x : ℝ, x = 2 * Real.log n ^ 2 := ⟨_, rfl⟩
-  rw [← hxdef] at hcon
-  have hx8192 : 8192 ≤ x := by rw [hxdef]; nlinarith
   have hx0 : 0 < x := by linarith
-  have hx1 : 1 ≤ x := by linarith
-  have hsx : Real.sqrt x / 2 = Real.sqrt 2 / 2 * Real.log n := by
-    rw [hxdef, sqrt_dos_L hL0]; ring
   -- carácter primitivo asociado y carácter trivial módulo 1
   have : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
   have hp : χ.primitiveCharacter.IsPrimitive := χ.primitiveCharacter_isPrimitive
@@ -226,7 +188,7 @@ theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimi
   -- sumas sobre ceros
   have hZs : ∀ (T' : ℝ) (hfin : (ZerosBelow χ.primitiveCharacter T').Finite),
       ‖∑ ρ ∈ hfin.toFinset, (mult χ.primitiveCharacter ρ : ℂ) * K x (2 / 5) (9 / 20) ρ‖ ≤
-        Real.sqrt 2 / 2 * Real.log n *
+        Real.sqrt x / 2 *
           ((Real.log χ.conductor + 43287 / 10000) * (5 / 9) +
             (Real.log χ.conductor + 37738 / 10000) * (10 / 19)) := by
     intro T' hfin
@@ -236,8 +198,7 @@ theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimi
       hfin).trans ?_
     have h1 := hadamard_chi_le h hS hG hp hχ' (σ := 1 + 2 / 5) (by norm_num) (by norm_num) hfin
     have h2 := hadamard_chi_le h hS hG hp hχ' (σ := 1 + 9 / 20) (by norm_num) (by norm_num) hfin
-    rw [hsx]
-    refine mul_le_mul_of_nonneg_left ?_ (mul_nonneg (by positivity) hL0)
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
     have k1 := div_le_div_of_nonneg_right h1 (show (0 : ℝ) ≤ 1 + 2 * (2 / 5) by norm_num)
     have k2 := div_le_div_of_nonneg_right h2 (show (0 : ℝ) ≤ 1 + 2 * (9 / 20) by norm_num)
     refine (add_le_add k1 k2).trans ?_
@@ -245,7 +206,7 @@ theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimi
     linarith
   have hZz : ∀ (T' : ℝ) (hfin : (ZerosBelow (1 : DirichletCharacter ℂ 1) T').Finite),
       ‖∑ ρ ∈ hfin.toFinset, (mult (1 : DirichletCharacter ℂ 1) ρ : ℂ) * K x (2 / 5) (9 / 20) ρ‖ ≤
-        Real.sqrt 2 / 2 * Real.log n * (52434 / 10000) := by
+        Real.sqrt x / 2 * (52434 / 10000) := by
     intro T' hfin
     refine (norm_sum_le _ _).trans ?_
     simp only [norm_mul, Complex.norm_natCast]
@@ -253,8 +214,7 @@ theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimi
       hfin).trans ?_
     have h1 := hadamard_zeta_le h hS hG (σ := 1 + 2 / 5) (by norm_num) (by norm_num) hfin
     have h2 := hadamard_zeta_le h hS hG (σ := 1 + 9 / 20) (by norm_num) (by norm_num) hfin
-    rw [hsx]
-    refine mul_le_mul_of_nonneg_left ?_ (mul_nonneg (by positivity) hL0)
+    refine mul_le_mul_of_nonneg_left ?_ (by positivity)
     have k1 := div_le_div_of_nonneg_right h1 (show (0 : ℝ) ≤ 1 + 2 * (2 / 5) by norm_num)
     have k2 := div_le_div_of_nonneg_right h2 (show (0 : ℝ) ≤ 1 + 2 * (9 / 20) by norm_num)
     exact (add_le_add k1 k2).trans hHz
@@ -285,27 +245,27 @@ theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimi
   have hRs := abs_le.mp (cota_res h h.refl hS hG hp hx0)
   have hR1 := abs_le.mp (cota_res h h.refl hS hG hp1 hx0)
   rw [hl1] at hR1
-  obtain ⟨hD1, hD0, hX⟩ := cotas_D_X hx8192
   have hRd : (Res (1 : DirichletCharacter ℂ 1) x (2 / 5) (9 / 20)).re -
-      (Res χ.primitiveCharacter x (2 / 5) (9 / 20)).re ≤ 625 / 1000 * Real.log χ.conductor + 30 := by
-    have := mul_le_mul_of_nonneg_left hD1 hℓ0
+      (Res χ.primitiveCharacter x (2 / 5) (9 / 20)).re ≤
+        Real.log χ.conductor * (20 * (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ)))) +
+          24 * (20 * (x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ)))) := by
     rw [hlq] at hRs
-    nlinarith [hRs.1, hR1.2]
+    have e1 : (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ))) / (9 / 20 - 2 / 5) =
+        20 * (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ))) := by ring
+    have e2 : (x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ))) / (9 / 20 - 2 / 5) =
+        20 * (x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ))) := by ring
+    rw [e1, e2] at hRs hR1
+    linarith [hRs.1, hR1.2]
   -- lado izquierdo
   have ht0 : 0 ≤ x ^ (-(1 / 2 : ℝ)) := Real.rpow_nonneg hx0.le _
-  have htL : x ^ (-(1 / 2 : ℝ)) * Real.log n * (141421 / 100000) ≤ 1 := by
-    have e : x ^ (-(1 / 2 : ℝ)) * (Real.sqrt 2 * Real.log n) = 1 := by
-      rw [← sqrt_dos_L hL0, ← hxdef, Real.sqrt_eq_rpow, ← Real.rpow_add hx0]; norm_num
-    have h2 := mul_le_mul_of_nonneg_left sqrt_dos_ge (mul_nonneg ht0 hL0)
-    linarith
-  have hA : |Real.log ((χ.conductor : ℝ) / Real.pi)| ≤ Real.log n + 139 / 100 := by
+  have hA : |Real.log ((χ.conductor : ℝ) / Real.pi)| ≤ Real.log χ.conductor + 139 / 100 := by
     rw [hlq, abs_le]; constructor <;> linarith
   have hB : |Real.log (((1 : ℕ) : ℝ) / Real.pi)| ≤ 139 / 100 := by
     rw [hl1, abs_neg, abs_of_nonneg (by linarith)]; exact hpi1
   have hV := VM_le_tres h hS hG (σ := 3 / 2) (by norm_num)
   have hP : 8 / Real.pi ≤ 255 / 100 := by
     rw [div_le_iff₀ Real.pi_pos]; linarith [Real.pi_gt_d2]
-  have hLEb := le_trans (add_le_add hLEs.2 hLE1.2) (cota_LE_num hn ht0 htL hA hB hV hP)
+  have hLEb := le_trans (add_le_add hLEs.2 hLE1.2) (cota_LE_gen ht0 hA hB hV hP)
   -- potencias de primos que dividen a `n`
   have hE := (cota_suma_potencias hx1 ((Finset.Icc 1 ⌊x⌋₊).filter (fun m => ¬ Nat.Coprime m n))
     n.primeFactors (fun p hp => Nat.prime_of_mem_primeFactors hp)
@@ -327,9 +287,85 @@ theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimi
       rw [Finset.mem_filter, Finset.mem_Icc] at hm
       exact (Nat.cast_le.mpr hm.1.2).trans (Nat.floor_le hx0.le))).trans
     (suma_cotaP_le' hn1 hqn hq1)
-  -- aritmética final
+  -- combinación
   rw [show ((1 : ℝ) + 2 / 5) * (1 + 9 / 20) = 203 / 100 by norm_num] at r2
+  linarith
+
+/-- Si `a² s ≤ x` con `√a ≤ s`, entonces `x^{2/5} ≥ a`, y de ahí cotas de `D(x)` y `X'(x)`. -/
+theorem cotas_D_X_gen {x a s : ℝ} (ha : 0 < a) (hs : Real.sqrt a ≤ s) (hx1 : 1 ≤ x)
+    (hx : a ^ 2 * s ≤ x) :
+    20 * (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ))) ≤ 20 / a ∧
+      0 ≤ 20 * (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ))) ∧
+      24 * (20 * (x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ)))) ≤ 960 / a := by
+  have hx0 : 0 < x := by linarith
+  have h52 : a ^ (5 / 2 : ℝ) ≤ x := by
+    have e : a ^ (5 / 2 : ℝ) = a ^ 2 * Real.sqrt a := by
+      rw [Real.sqrt_eq_rpow, show (5 / 2 : ℝ) = 2 + 1 / 2 by norm_num, Real.rpow_add ha,
+        Real.rpow_two]
+    rw [e]
+    exact (mul_le_mul_of_nonneg_left hs (by positivity)).trans hx
+  have hge : a ≤ x ^ (2 / 5 : ℝ) := by
+    have e : a = (a ^ (5 / 2 : ℝ)) ^ (2 / 5 : ℝ) := by
+      rw [← Real.rpow_mul ha.le]; norm_num
+    rw [e]
+    exact Real.rpow_le_rpow (by positivity) h52 (by norm_num)
+  have hu : x ^ (-(2 / 5 : ℝ)) ≤ 1 / a := by
+    rw [Real.rpow_neg hx0.le, ← one_div]
+    exact one_div_le_one_div_of_le ha hge
+  have hv : x ^ (-(9 / 20 : ℝ)) ≤ x ^ (-(2 / 5 : ℝ)) :=
+    Real.rpow_le_rpow_of_exponent_le hx1 (by norm_num)
+  have hv0 : 0 < x ^ (-(9 / 20 : ℝ)) := Real.rpow_pos_of_pos hx0 _
+  rw [div_eq_mul_one_div 20 a, div_eq_mul_one_div 960 a]
+  refine ⟨by linarith, by linarith, by linarith⟩
+
+/-- **Cota de Bach con constante explícita.** Bajo GRH y las hipótesis analíticas de Alpöge, si
+`log n ≥ 64`, todo carácter `χ ≠ 1` módulo `n` toma un valor `≠ 1` en algún `a ≤ 2 (log n)²`
+coprimo con `n`. Sale de `desigualdad_bach` con `x = 2 (log n)²`. -/
+theorem cota_bach_explicita (h : HipHadamard) (hS : SerieDigamma) (hG : GRHPrimitivo) :
+    ∀ n : ℕ, 64 ≤ Real.log n → ∀ χ : DirichletCharacter ℂ n, χ ≠ 1 →
+      ∃ a : ℕ, (a : ℝ) ≤ 2 * Real.log n ^ 2 ∧ Nat.Coprime a n ∧ χ a ≠ 1 := by
+  intro n hn χ hχ
+  by_contra hcon
+  push Not at hcon
+  have hn1 : 1 ≤ n := Nat.pos_of_ne_zero fun h0 => by
+    rw [h0, Nat.cast_zero, Real.log_zero] at hn; linarith
+  have : NeZero n := ⟨by omega⟩
+  have hL0 : 0 ≤ Real.log n := by linarith
+  obtain ⟨x, hxdef⟩ : ∃ x : ℝ, x = 2 * Real.log n ^ 2 := ⟨_, rfl⟩
+  rw [← hxdef] at hcon
+  have hx8192 : 8192 ≤ x := by rw [hxdef]; nlinarith
+  have hx0 : 0 < x := by linarith
+  have hx1 : 1 ≤ x := by linarith
+  have key := desigualdad_bach h hS hG hn1 hχ hx1 hcon
+  -- cotas numéricas
+  have hs32 : Real.sqrt 32 ≤ 5657 / 1000 := by
+    rw [Real.sqrt_le_left (by norm_num)]; norm_num
+  obtain ⟨hD, hD0, hX⟩ := cotas_D_X_gen (a := 32) (by norm_num) hs32 hx1 (by linarith)
+  have hsx : Real.sqrt x = Real.sqrt 2 * Real.log n := by rw [hxdef, sqrt_dos_L hL0]
+  have ht0 : 0 ≤ x ^ (-(1 / 2 : ℝ)) := Real.rpow_nonneg hx0.le _
+  have htL : x ^ (-(1 / 2 : ℝ)) * Real.log n * (141421 / 100000) ≤ 1 := by
+    have e : x ^ (-(1 / 2 : ℝ)) * (Real.sqrt 2 * Real.log n) = 1 := by
+      rw [← hsx, Real.sqrt_eq_rpow, ← Real.rpow_add hx0]; norm_num
+    have h2 := mul_le_mul_of_nonneg_left sqrt_dos_ge (mul_nonneg ht0 hL0)
+    linarith
+  have : NeZero χ.conductor := ⟨χ.conductor_ne_zero⟩
+  have hq1 : 1 ≤ χ.conductor := NeZero.one_le
+  have hℓ0 : 0 ≤ Real.log χ.conductor := Real.log_nonneg (by exact_mod_cast hq1)
+  have hℓL : Real.log χ.conductor ≤ Real.log n :=
+    Real.log_le_log (by exact_mod_cast hq1)
+      (by exact_mod_cast Nat.le_of_dvd (by omega) χ.conductor_dvd_level)
+  have hLE : x ^ (-(1 / 2 : ℝ)) * (10 * Real.log χ.conductor + 6729 / 10) ≤ 1460 / 100 := by
+    have h1 := mul_le_mul_of_nonneg_left hℓL ht0
+    have h2 := mul_le_mul_of_nonneg_left hn ht0
+    nlinarith
+  have hRd : Real.log χ.conductor * (20 * (x ^ (-(2 / 5 : ℝ)) - x ^ (-(9 / 20 : ℝ)))) +
+      24 * (20 * (x ^ (-(2 / 5 : ℝ)) + x ^ (-(9 / 20 : ℝ)))) ≤
+        625 / 1000 * Real.log χ.conductor + 30 := by
+    have := mul_le_mul_of_nonneg_left hD hℓ0
+    norm_num at this hX ⊢
+    linarith
+  rw [hsx] at key
   exact aritmetica_final hn hℓ0 hℓL (r := Real.sqrt 2 / 2) (by positivity)
-    (by linarith [sqrt_dos_le]) le_rfl le_rfl hLEb hRd hE hE' (by linarith)
+    (by linarith [sqrt_dos_le]) le_rfl le_rfl hLE hRd le_rfl le_rfl (by linarith)
 
 end AMate.Miller.Explicito

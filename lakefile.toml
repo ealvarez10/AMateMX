@@ -26,6 +26,15 @@ name = "AMateDirichlet"
 [[lean_lib]]
 name = "AMateMiller"
 
+# The certified Miller test as a command-line program (Lean core only, no Mathlib).
+# Build with `lake build amate-primo`; its correctness is AMate.Miller.esPrimo_eq.
+[[lean_lib]]
+name = "AMatePrimo"
+
+[[lean_exe]]
+name = "amate-primo"
+root = "AMatePrimo.Principal"
+
 # Optional composition with the Lean library announced by Alpöge (2026).
 # It needs that full library (175,187 modules) and its build cache, so it is
 # not built by default. To enable it, point `path` to your copy of that

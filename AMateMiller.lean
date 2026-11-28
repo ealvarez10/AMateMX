@@ -26,3 +26,6 @@ import AMateMiller.BachExplicito
 import AMateMiller.DeterministaExplicito
 import AMateMiller.BachGeneral
 import AMateMiller.MillerCertificado
+import AMateMiller.Corolarios
+import AMateMiller.SolovayStrassen
+import AMateMiller.Rapido

@@ -143,6 +143,7 @@ import AMateConAlpoge.CertificadoAlpoge
 #print axioms AMate.Miller.esPrimoMiller_certificado_alpoge
 #print axioms AMate.Miller.noResiduo_16_alpoge
 #print axioms AMate.Miller.noResiduo_explicito_alpoge
+#print axioms AMate.Miller.esPrimo_alpoge
 LEAN
 chown "$USUARIO:" "$DIR_PROY/VerificacionComposiciones.lean"
 como "cd $DIR_PROY && lake env lean VerificacionComposiciones.lean" > "$SALIDA/axiomas.txt" 2>&1 \
@@ -155,7 +156,7 @@ python3 -I - "$SALIDA/axiomas.txt" <<'PY' || die "aparecen axiomas no estándar 
 import re, sys
 texto = open(sys.argv[1]).read()
 bloques = re.findall(r"depends on axioms: \[([^\]]*)\]", texto, re.S)
-assert len(bloques) == 13, f"se esperaban 13 listas de axiomas y hay {len(bloques)}"
+assert len(bloques) == 14, f"se esperaban 14 listas de axiomas y hay {len(bloques)}"
 for b in bloques:
     ax = {a.strip() for a in b.split(",") if a.strip()}
     assert ax <= {"propext", "Classical.choice", "Quot.sound"}, ax

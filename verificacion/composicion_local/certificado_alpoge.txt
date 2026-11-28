@@ -1,11 +1,26 @@
-Compilación local de AMateConAlpoge/CertificadoAlpoge.lean (28 de noviembre de 2026)
+Compilación local de las composiciones que importan Main (28 de noviembre de 2026)
 Lean 4.33.1, contra los binarios de la biblioteca de Alpöge usados en la composición local (ver el artículo).
+Se repitió después de unificar AMateMiller/BachExplicito.lean con la desigualdad general.
 
---- Huella de la fuente ---
-38359327b5bc08ce1b7c9d63d298e618d5663ad0f44b5d16286012b2a7f17e22  AMateConAlpoge/CertificadoAlpoge.lean
+--- Huellas de las fuentes ---
+fb969cde6ba3e776f0a69d225226b5568e568c521592b625e259ea22bcdf301d  AMateConAlpoge/MillerAlpoge.lean
+47f52a73a14c27ab76640853b33a04b290c71a107558eb4baddaca2917dadca4  AMateConAlpoge/CertificadoAlpoge.lean
+e8bb6a87867048f2ffd298c066a9fb67934d40400aee1c409c41fec3225d7612  AMateConAlpoge/HipotesisAlpoge.lean
+78b1ec6d623f605d4a24740a5248692481625ba6887c47b32bbc8823b8e881b4  AMateMiller/BachExplicito.lean
 
 --- Salida de lean ---
+== MillerAlpoge
+'AMate.Miller.cota_bach_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AMate.Miller.esPrimoMiller_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AMate.Miller.cota_bach_cuad_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AMate.Miller.esPrimoMiller_cuad_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AMate.Miller.cota_bach_explicita_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'AMate.Miller.esPrimoMiller_explicito_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+CODIGO=0 minutos=29
+== CertificadoAlpoge
 'AMate.Miller.esPrimoMiller_certificado_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
 'AMate.Miller.noResiduo_16_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
 'AMate.Miller.noResiduo_explicito_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
-Código de salida 0, 15 minutos (casi todo, cargar Main).
+'AMate.Miller.esPrimo_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+CODIGO=0 minutos=19
+

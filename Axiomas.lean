@@ -57,3 +57,13 @@ Run with `lake env lean Axiomas.lean` after `lake build`. Every line must list o
 #print axioms AMate.Miller.esPrimoMiller_certificado
 #print axioms AMate.Miller.noResiduo_16
 #print axioms AMate.Miller.noResiduo_explicito
+#print axioms AMate.Miller.generan_explicito
+#print axioms AMate.Miller.generan_16
+#print axioms AMate.Miller.generan_certificadas
+#print axioms AMate.Miller.noPotencia_16
+#print axioms AMate.Miller.noPotencia_explicito
+#print axioms AMate.Miller.primo_de_euler
+#print axioms AMate.Miller.test_euler_correcto
+#print axioms AMate.Miller.test_euler_certificado
+#print axioms AMate.Miller.esPrimo_eq
+#print axioms AMate.Miller.esPrimo_correcto

@@ -1,4 +1,4 @@
-Checked 76636 declarations with no errors
+Checked 77350 declarations with no errors
 
-real	0m53s (lean4export + nanoda)
+real	0m51s (lean4export + nanoda)
 CODIGO=0

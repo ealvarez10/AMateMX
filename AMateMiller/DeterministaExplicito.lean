@@ -15,6 +15,10 @@ es computable y cumple `CotaCaracteres` bajo GRH y las hipótesis analíticas de
 * Si `n ≥ 2^93`, entonces `log n ≥ 93 log 2 > 64` y `2 (log n)² ≤ 2 (log 2)² (⌊log₂ n⌋ + 1)²
   ≤ (⌊log₂ n⌋ + 1)²`, porque `2 (log 2)² < 0.961`.
 * Si `n < 2^93` se usan todas las bases `a ≤ n` (correcto sin hipótesis, pero lento).
+
+`basesCertificadas` (`MillerCertificado.lean`) lo mejora: con las cotas de constante `16` y `4`
+solo usa todas las bases por debajo de `4096`. `basesExplicitas` se conserva porque es la versión
+que se compiló con la biblioteca de Alpöge en la máquina virtual (`MillerAlpoge.lean`).
 -/
 
 namespace AMate.Miller

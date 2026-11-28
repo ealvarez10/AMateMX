@@ -1,4 +1,5 @@
 import AMateMiller.MillerCertificado
+import AMateMiller.Rapido
 import AMateConAlpoge.HipotesisAlpoge
 import Main
 
@@ -11,7 +12,8 @@ Con las hipótesis analíticas de `HipotesisAlpoge.lean` y la GRH de la bibliote
 * `esPrimoMiller_certificado_alpoge`: el test de Miller con `basesCertificadas` (todas las bases
   solo por debajo de `4096`) decide la primalidad;
 * `noResiduo_16_alpoge`, `noResiduo_explicito_alpoge`: todo primo impar `p` con `log p ≥ 8.3`
-  tiene un no-residuo cuadrático `a ≤ 16 (log p)²`, y `a ≤ 2 (log p)²` si `log p ≥ 64`.
+  tiene un no-residuo cuadrático `a ≤ 16 (log p)²`, y `a ≤ 2 (log p)²` si `log p ≥ 64`;
+* `esPrimo_alpoge`: el programa `amate-primo` (`AMate.Primo.esPrimo`) decide la primalidad.
 
 Como `MillerAlpoge.lean`, importa `Main` y no se compila por defecto.
 -/
@@ -35,8 +37,13 @@ theorem noResiduo_explicito_alpoge {p : ℕ} (hp : p.Prime) (hL : 64 ≤ Real.lo
   noResiduo_explicito hipHadamard_alpoge serieDigamma_alpoge LFunction_eq_zero_re_of_isPrimitive
     hp hL
 
+/-- El programa `amate-primo` decide la primalidad, sin hipótesis. -/
+theorem esPrimo_alpoge (n : ℕ) : AMate.Primo.esPrimo n = true ↔ n.Prime :=
+  esPrimo_correcto hipHadamard_alpoge serieDigamma_alpoge LFunction_eq_zero_re_of_isPrimitive n
+
 end AMate.Miller
 
 #print axioms AMate.Miller.esPrimoMiller_certificado_alpoge
 #print axioms AMate.Miller.noResiduo_16_alpoge
 #print axioms AMate.Miller.noResiduo_explicito_alpoge
+#print axioms AMate.Miller.esPrimo_alpoge
