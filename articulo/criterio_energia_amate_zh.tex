@@ -43,7 +43,7 @@
 \title[黎曼猜想的一个能量判据]{黎曼猜想的一个能量判据、其校准及其在 Lean 中的形式化验证}
 \author{Ernesto \'Alvarez}
 \thanks{本工作是 Ernesto \'Alvarez 的 AMate 项目的一部分。Lean 库 \texttt{AMateEnergia}、\texttt{AMateDirichlet} 和 \texttt{AMateMiller} 均属于该项目。形式化证明与数值检验是在语言模型的协助下完成的。}
-\date{2026年11月27日（草稿）}
+\date{2026年11月28日（草稿）}
 
 \begin{document}
 
@@ -254,9 +254,9 @@ E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
 \item 若 $p$ 为素数，则模 $p$ 的每个单位都是强伪证（strong liar）；
 \item 若 $n\ge3$ 为奇合数，则全体强伪证包含在 $(\mathbb Z/n\mathbb Z)^\times$ 的某个真子群中。
 \end{itemize}
-由有限阿贝尔群 $(\mathbb Z/n\mathbb Z)^\times/H$ 的对偶性，每个真子群 $H$ 都包含在某个非主狄利克雷特征的核中。因此，若模 $n$ 的每个非主特征都在某个与 $n$ 互素的 $a\le B(n)$ 处取不等于 $1$ 的值，则以 $a\le B(n)$ 为底的米勒检验是正确的。该检验在 Lean 中可执行（\texttt{esPrimoMiller}，使用快速模幂），并且 \texttt{esPrimoMiller\_correcto} 证明了对每个这样的 $B$ 它都能判定素性；取 $B(n)=n$ 时该假设平凡成立。在假设 GRH、$\psi(x,\chi)$ 的截断显式公式以及高度为 $1$ 的窗口中零点个数的界的前提下，我们证明了存在常数 $K$ 使 $B(n)=\lfloor K(1+\log n)^4\rfloor$ 满足条件；把显式公式用于模 $1$ 的平凡特征即得 $\psi(x)$ 的下界。在 $[x/2,x]$ 上对显式公式积分，可把指数降到 $2$：$B(n)=\lfloor K(1+\log n)^2\rfloor$ 同样满足条件。Alp\"oge 的库证明了这三个条件。将其与这些结果组合，可无条件地得到分别使用 $O((\log n)^4)$ 个和 $O((\log n)^2)$ 个底的确定性米勒检验；与定理~\ref{teo:dirichlet}(5) 组合，则对每个非主特征 $\chi$ 得到 $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$。这两个组合都已写成，并已针对其所用命题的逐字副本完成类型检查；尚待与 Alp\"oge 的库一起编译。
+由有限阿贝尔群 $(\mathbb Z/n\mathbb Z)^\times/H$ 的对偶性，每个真子群 $H$ 都包含在某个非主狄利克雷特征的核中。因此，若模 $n$ 的每个非主特征都在某个与 $n$ 互素的 $a\le B(n)$ 处取不等于 $1$ 的值，则以 $a\le B(n)$ 为底的米勒检验是正确的。该检验在 Lean 中可执行（\texttt{esPrimoMiller}，使用快速模幂），并且 \texttt{esPrimoMiller\_correcto} 证明了对每个这样的 $B$ 它都能判定素性；取 $B(n)=n$ 时该假设平凡成立。在假设 GRH、$\psi(x,\chi)$ 的截断显式公式以及高度为 $1$ 的窗口中零点个数的界的前提下，我们证明了存在常数 $K$ 使 $B(n)=\lfloor K(1+\log n)^4\rfloor$ 满足条件；把显式公式用于模 $1$ 的平凡特征即得 $\psi(x)$ 的下界。在 $[x/2,x]$ 上对显式公式积分，可把指数降到 $2$：$B(n)=\lfloor K(1+\log n)^2\rfloor$ 同样满足条件。Alp\"oge 的库证明了这三个条件。将其与这些结果组合，可无条件地得到分别使用 $O((\log n)^4)$ 个和 $O((\log n)^2)$ 个底的确定性米勒检验；与定理~\ref{teo:dirichlet}(5) 组合，则对每个非主特征 $\chi$ 得到 $E_{Q,\chi}\ll_\varepsilon Q^\varepsilon$。这两个组合都已与 Alp\"oge 的库（在虚拟机上从源代码重新编译）一起编译通过，其定理只依赖三个标准公理。
 
-这些常数 $K$ 都不是显式的。为了得到经认证的检验，我们还证明了带显式常数的 Bach 界（\texttt{cota\_bach\_explicita}）。我们假设 GRH 以及 Alp\"oge 库中的若干分析命题：矩形上的柯西公式、零点的位置与有限性、$L'/L$ 的正则部分与函数方程、双伽马函数的界、好高度，以及双伽马函数的级数表示。于是，若 $\log n\ge 64$，则模 $n$ 的每个非主特征都在某个与 $n$ 互素的 $a\le 2(\log n)^2$ 处取不等于 $1$ 的值。证明使用核 $x^s/((s+\alpha)(s+\beta))$，其中 $\alpha=2/5$、$\beta=9/20$、$x=2(\log n)^2$；还用到关联本原特征与 $\zeta$ 的加权显式公式、零点和的 Hadamard 型界，以及左边界、留数和整除 $n$ 的素数之幂的显式界。因此，对 $n\ge 2^{93}$ 使用 $(\lfloor\log_2 n\rfloor+1)^2$ 个底、对 $n<2^{93}$ 使用全部底 $a\le n$ 的检验能判定素性（\texttt{esPrimoMiller\_explicito}），并可在 Lean 中运行。上述命题在一个不导入该库主模块的文件中由 Alp\"oge 的定理实例化；我们已将该文件与该库一起编译，它只用到三个标准公理。再用该库中的 GRH，检验即无需任何假设，相应的组合尚待编译。
+这些常数 $K$ 都不是显式的。为了得到经认证的检验，我们还证明了带显式常数的 Bach 界（\texttt{cota\_bach\_explicita}）。我们假设 GRH 以及 Alp\"oge 库中的若干分析命题：矩形上的柯西公式、零点的位置与有限性、$L'/L$ 的正则部分与函数方程、双伽马函数的界、好高度，以及双伽马函数的级数表示。于是，若 $\log n\ge 64$，则模 $n$ 的每个非主特征都在某个与 $n$ 互素的 $a\le 2(\log n)^2$ 处取不等于 $1$ 的值。证明使用核 $x^s/((s+\alpha)(s+\beta))$，其中 $\alpha=2/5$、$\beta=9/20$、$x=2(\log n)^2$；还用到关联本原特征与 $\zeta$ 的加权显式公式、零点和的 Hadamard 型界，以及左边界、留数和整除 $n$ 的素数之幂的显式界。因此，对 $n\ge 2^{93}$ 使用 $(\lfloor\log_2 n\rfloor+1)^2$ 个底、对 $n<2^{93}$ 使用全部底 $a\le n$ 的检验能判定素性（\texttt{esPrimoMiller\_explicito}），并可在 Lean 中运行。上述命题在一个不导入该库主模块的文件中由 Alp\"oge 的定理实例化；我们已将该文件与该库一起编译，它只用到三个标准公理。再用该库中的 GRH，检验即无需任何假设（\texttt{esPrimoMiller\_explicito\_alpoge}）；这一组合同样已编译通过，只用到三个标准公理。
 
 \begin{observacion}
 形式化验证保证的是 Lean 内核接受这些证明。它不能取代对 Alp\"oge 证明的人工数学审查；据公开信息，这一审查尚未完成。第 2--7 节的结果不依赖于该证明。
