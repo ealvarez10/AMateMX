@@ -221,7 +221,7 @@ Aucun ne contient \texttt{sorry}, et la commande \texttt{\#print axioms} ne fait
 \subsection*{Composition avec la biblioth\`eque d'Alp\"oge}
 Le 20 novembre 2026 a \'et\'e annonc\'ee~\cite{Alpoge} une biblioth\`eque Lean (175\,187 modules) qui d\'emontre \texttt{riemannHypothesis : RiemannHypothesis}, avec l'\'enonc\'e de Mathlib, ainsi que la non-annulation de $L(s,\chi)$ dans $\Re s>1/2$ pour tout caract\`ere de Dirichlet. Le MIT a publi\'e une v\'erification par plusieurs noyaux ind\'ependants~\cite{MIT}.
 \begin{itemize}
-\item \emph{Reproduction ind\'ependante.} Nous avons compil\'e la biblioth\`eque \`a partir des sources, sous le chemin utilis\'e par le MIT, sur notre propre machine virtuelle. Les 175\,187 fichiers \texttt{.olean} se sont r\'ev\'el\'es identiques octet par octet \`a la liste du MIT, y compris l'unique module que le MIT documente comme non d\'eterministe.
+\item \emph{Reproduction ind\'ependante.} Nous avons compil\'e la biblioth\`eque \`a partir des sources, sous le chemin utilis\'e par le MIT, sur notre propre machine virtuelle. Les 175\,187 fichiers \texttt{.olean} se sont r\'ev\'el\'es identiques octet par octet \`a la liste du MIT, y compris l'unique module que le MIT documente comme non d\'eterministe. Une seconde compilation, sur une autre machine virtuelle et quelques jours plus tard, a donn\'e le m\^eme r\'esultat.
 \item \emph{Composition.} La composition
 \[
 \texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon

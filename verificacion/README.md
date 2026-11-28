@@ -18,6 +18,8 @@ Result ([resultado.txt](reproduccion_vm/resultado.txt), [comparacion_mit.txt](re
 
 The full result archive (34 MB, with the hash of every module and the build logs) is not in this repository. Its SHA-256 is in [amate_resultado.tar.gz.sha256](reproduccion_vm/amate_resultado.tar.gz.sha256).
 
+**Second rebuild (27–28 November 2026).** The same script ran again on a new virtual machine (64 vCPU, 265 GB of RAM, Ubuntu 24.04), before the compositions below. The result was the same: 175,187 modules built in 11 hours with no module failing, all 175,187 `.olean` files byte-identical to the MIT list, `Main.olean` with the same SHA-256, and `AMate.energia_subpolinomial_alpoge` and `riemannHypothesis` depending only on the three standard axioms ([resultado_2026-11-28.txt](reproduccion_vm/resultado_2026-11-28.txt), [comparacion_mit_2026-11-28.txt](reproduccion_vm/comparacion_mit_2026-11-28.txt)). The SHA-256 of its result archive is in [amate_resultado_2026-11-28.tar.gz.sha256](reproduccion_vm/amate_resultado_2026-11-28.tar.gz.sha256).
+
 ## `nanoda/`: independent kernel recheck (27 November 2026)
 
 The main theorems of `AMateEnergia`, `AMateDirichlet` and `AMateMiller` were exported with `lean4export` and checked by `nanoda`:

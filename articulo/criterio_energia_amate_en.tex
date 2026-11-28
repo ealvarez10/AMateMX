@@ -220,7 +220,7 @@ None of them contains \texttt{sorry}, and \texttt{\#print axioms} lists only \te
 \subsection*{Composition with Alp\"oge's library}
 On 20 November 2026 a Lean library (175\,187 modules) was announced~\cite{Alpoge} that proves \texttt{riemannHypothesis : RiemannHypothesis}, with the Mathlib statement, and the non-vanishing of $L(s,\chi)$ in $\Re s>1/2$ for every Dirichlet character. MIT published a verification with several independent kernels~\cite{MIT}.
 \begin{itemize}
-\item \emph{Independent reproduction.} We compiled the library from source, at the path used by MIT, on a virtual machine of our own. The 175\,187 \texttt{.olean} files turned out to be byte-for-byte identical to MIT's list, including the only module that MIT documents as non-deterministic.
+\item \emph{Independent reproduction.} We compiled the library from source, at the path used by MIT, on a virtual machine of our own. The 175\,187 \texttt{.olean} files turned out to be byte-for-byte identical to MIT's list, including the only module that MIT documents as non-deterministic. A second build, on another virtual machine and a few days later, gave the same result.
 \item \emph{Composition.} The composition
 \[
 \texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon

@@ -1,0 +1,10 @@
+Lista del MIT: descargada y verificada
+Ruta de compilación: /home/ubuntu/grh/src/lean
+Archivos compilados aquí: 175187
+Archivos que guardan la ruta de compilación: 98219 (en el MIT: 98219 de 175.187)
+Archivos en la lista del MIT: 175187
+Idénticos byte a byte: 175187 (LocModel.olean coincide con la otra salida que documenta el MIT)
+Distintos: 0 (0 guardan la ruta de compilación, 0 no)
+En la lista del MIT pero no compilados aquí: 0
+Compilados aquí pero no en la lista del MIT: 0
+CONCLUSIÓN: todos idénticos

@@ -55,7 +55,7 @@ All of them compile with that library, and their theorems depend only on the thr
 
 These files need the compiled library (175,187 modules, Lean 4.33.1, same Mathlib). Our own build of it took 11 hours on 64 cores and 255 GB of RAM. To compile them, uncomment the corresponding blocks in `lakefile.toml`.
 
-[verificacion/reproduccion_vm/](verificacion/reproduccion_vm/) documents an independent rebuild of that library from source. All 175,187 `.olean` files came out byte-identical to the list published by MIT, including the module that MIT documents as nondeterministic. The script used is included.
+[verificacion/reproduccion_vm/](verificacion/reproduccion_vm/) documents two independent rebuilds of that library from source, on two different virtual machines (23 and 28 November 2026). Both times, all 175,187 `.olean` files came out byte-identical to the list published by MIT, including the module that MIT documents as nondeterministic. The script used is included.
 
 ## Repository layout
 

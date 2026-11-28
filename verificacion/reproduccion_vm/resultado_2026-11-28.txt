@@ -1,0 +1,27 @@
+TERMINADO: composición compilada y comprobada
+
+Commit de la biblioteca: 40e56bab026552e089d7afcfeff08d2defb9c005
+Toolchain: leanprover/lean4:v4.33.1; Mathlib 0df444a360eaa60ab8c11dca51a86af692955474
+Máquina: 64 núcleos, 265 GB de RAM; vm.max_map_count 1048576
+Duración total: 11 h (de esta ejecución del script)
+Módulos compilados: 175187
+
+--- Comprobación final (lake env lean Verificacion.lean) ---
+AMate.energia_subpolinomial_alpoge : ∀ (ε : ℝ), 0 < ε → ∃ C, ∀ (Q : ℕ), 2 ≤ Q → AMate.E Q ≤ C * ↑Q ^ ε
+'AMate.energia_subpolinomial_alpoge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'riemannHypothesis' depends on axioms: [propext, Classical.choice, Quot.sound]
+
+Main.olean sha256 9146dfb4148e24d2252e04c50742f3e49dd126dfcc5006d10bf5f873ddf796ad
+Coincide con el del MIT.
+
+--- Comparación con el MIT ---
+Lista del MIT: descargada y verificada
+Ruta de compilación: /home/ubuntu/grh/src/lean
+Archivos compilados aquí: 175187
+Archivos que guardan la ruta de compilación: 98219 (en el MIT: 98219 de 175.187)
+Archivos en la lista del MIT: 175187
+Idénticos byte a byte: 175187 (LocModel.olean coincide con la otra salida que documenta el MIT)
+Distintos: 0 (0 guardan la ruta de compilación, 0 no)
+En la lista del MIT pero no compilados aquí: 0
+Compilados aquí pero no en la lista del MIT: 0
+CONCLUSIÓN: todos idénticos

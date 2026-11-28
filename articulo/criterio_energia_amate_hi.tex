@@ -249,7 +249,7 @@ E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
 \subsection*{Alp\"oge की लाइब्रेरी के साथ संयोजन}
 20 नवंबर 2026 को एक Lean लाइब्रेरी (175\,187 मॉड्यूल) की घोषणा की गई~\cite{Alpoge}, जो Mathlib के कथन के साथ \texttt{riemannHypothesis : RiemannHypothesis} को सिद्ध करती है, और साथ ही यह भी कि प्रत्येक डिरिक्ले लक्षण के लिए $\Re s>1/2$ में $L(s,\chi)$ शून्य नहीं होता। MIT ने कई स्वतंत्र कर्नेलों के साथ एक सत्यापन प्रकाशित किया~\cite{MIT}।
 \begin{itemize}
-\item \textbf{स्वतंत्र पुनरुत्पादन।} हमने लाइब्रेरी को स्रोतों से, MIT द्वारा प्रयुक्त पथ पर, अपनी एक आभासी मशीन (virtual machine) में संकलित किया। सभी 175\,187 \texttt{.olean} फ़ाइलें MIT की सूची से बाइट-दर-बाइट समान निकलीं, जिसमें वह एकमात्र मॉड्यूल भी शामिल है जिसे MIT अनियतात्मक (non-deterministic) के रूप में दर्ज करता है।
+\item \textbf{स्वतंत्र पुनरुत्पादन।} हमने लाइब्रेरी को स्रोतों से, MIT द्वारा प्रयुक्त पथ पर, अपनी एक आभासी मशीन (virtual machine) में संकलित किया। सभी 175\,187 \texttt{.olean} फ़ाइलें MIT की सूची से बाइट-दर-बाइट समान निकलीं, जिसमें वह एकमात्र मॉड्यूल भी शामिल है जिसे MIT अनियतात्मक (non-deterministic) के रूप में दर्ज करता है। कुछ दिनों बाद एक दूसरी आभासी मशीन पर किया गया दूसरा संकलन भी यही परिणाम देता है।
 \item \textbf{संयोजन।} संयोजन
 \[
 \texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon

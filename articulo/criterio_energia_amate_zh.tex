@@ -237,7 +237,7 @@ E_Q\approx\sum_{\rho,\rho'}c_{\rho,\rho'}\,Q^{i(\gamma-\gamma')},
 \subsection*{与 Alp\"oge 库的组合}
 2026年11月20日公布的一个 Lean 库~\cite{Alpoge}（共 175\,187 个模块）以 Mathlib 中的表述证明了 \texttt{riemannHypothesis : RiemannHypothesis}，并证明了对每个狄利克雷特征，$L(s,\chi)$ 在 $\Re s>1/2$ 中不为零。MIT 发布了一份使用多个独立内核完成的验证~\cite{MIT}。
 \begin{itemize}
-\item \emph{独立复现。}我们在自己的虚拟机上、在 MIT 所用的同一路径下，从源代码编译了该库。所得的 175\,187 个 \texttt{.olean} 文件与 MIT 的列表逐字节一致，其中包括 MIT 记录为非确定性的唯一模块。
+\item \emph{独立复现。}我们在自己的虚拟机上、在 MIT 所用的同一路径下，从源代码编译了该库。所得的 175\,187 个 \texttt{.olean} 文件与 MIT 的列表逐字节一致，其中包括 MIT 记录为非确定性的唯一模块。几天后在另一台虚拟机上再次编译，结果相同。
 \item \emph{组合。}组合定理
 \[
 \texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon

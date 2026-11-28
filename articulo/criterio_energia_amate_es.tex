@@ -221,7 +221,7 @@ Ninguno contiene \texttt{sorry}, y \texttt{\#print axioms} lista solo \texttt{pr
 \subsection*{Composici\'on con la biblioteca de Alp\"oge}
 El 20 de noviembre de 2026 se anunci\'o~\cite{Alpoge} una biblioteca de Lean (175\,187 m\'odulos) que demuestra \texttt{riemannHypothesis : RiemannHypothesis}, con el enunciado de Mathlib, y la no anulaci\'on de $L(s,\chi)$ en $\Re s>1/2$ para todo car\'acter de Dirichlet. El MIT public\'o una verificaci\'on con varios n\'ucleos independientes~\cite{MIT}.
 \begin{itemize}
-\item \emph{Reproducci\'on independiente.} Compilamos la biblioteca desde las fuentes, en la ruta usada por el MIT, en una m\'aquina virtual propia. Los 175\,187 archivos \texttt{.olean} resultaron id\'enticos byte a byte a la lista del MIT, incluido el \'unico m\'odulo que el MIT documenta como no determinista.
+\item \emph{Reproducci\'on independiente.} Compilamos la biblioteca desde las fuentes, en la ruta usada por el MIT, en una m\'aquina virtual propia. Los 175\,187 archivos \texttt{.olean} resultaron id\'enticos byte a byte a la lista del MIT, incluido el \'unico m\'odulo que el MIT documenta como no determinista. Una segunda compilaci\'on, en otra m\'aquina virtual y unos d\'ias despu\'es, dio el mismo resultado.
 \item \emph{Composici\'on.} La composici\'on
 \[
 \texttt{AMate.energia\_subpolinomial\_alpoge}:\ \forall\varepsilon>0,\ \exists C,\ \forall Q\ge2,\ E_Q\le CQ^\varepsilon
