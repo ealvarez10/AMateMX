@@ -39,4 +39,5 @@ name = "AMateMiller"
 # name = "AMateConAlpoge"
 # roots = ["AMateConAlpoge.Composicion", "AMateConAlpoge.Consecuencias",
 #   "AMateConAlpoge.VerificacionConjunta", "AMateConAlpoge.ComposicionDirichlet",
-#   "AMateConAlpoge.HipotesisAlpoge", "AMateConAlpoge.MillerAlpoge"]
+#   "AMateConAlpoge.HipotesisAlpoge", "AMateConAlpoge.MillerAlpoge",
+#   "AMateConAlpoge.CertificadoAlpoge"]

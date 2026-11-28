@@ -50,3 +50,10 @@ Run with `lake env lean Axiomas.lean` after `lake build`. Every line must list o
 #print axioms AMate.Miller.Explicito.cota_bach_explicita
 #print axioms AMate.Miller.cotaCaracteres_basesExplicitas
 #print axioms AMate.Miller.esPrimoMiller_explicito
+#print axioms AMate.Miller.Explicito.desigualdad_bach
+#print axioms AMate.Miller.Explicito.cota_bach_16
+#print axioms AMate.Miller.Explicito.cota_bach_4
+#print axioms AMate.Miller.cotaCaracteres_basesCertificadas
+#print axioms AMate.Miller.esPrimoMiller_certificado
+#print axioms AMate.Miller.noResiduo_16
+#print axioms AMate.Miller.noResiduo_explicito

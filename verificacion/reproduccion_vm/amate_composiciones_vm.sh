@@ -11,6 +11,7 @@
 #   AMateConAlpoge/HipotesisAlpoge.lean       hipótesis analíticas de la cota de Bach explícita
 #   AMateConAlpoge/MillerAlpoge.lean          test de Miller determinista con O((log n)^4) y O((log n)^2)
 #                                             bases, y test certificado con la cota explícita 2(log n)^2
+#   AMateConAlpoge/CertificadoAlpoge.lean     test certificado para todo n y menor no-residuo cuadrático
 #
 # Uso, con la versión de AMate subida a la máquina como tar.gz de publicacion/amate-lean:
 #     sudo AMATE_TAR=/ruta/amate-lean.tar.gz AMATE_SHA256=<huella> nohup bash amate_composiciones_vm.sh \
@@ -63,7 +64,7 @@ else
     die "indica AMATE_TAR o AMATE_COMMIT"
 fi
 for f in AMateConAlpoge/Composicion.lean AMateConAlpoge/ComposicionDirichlet.lean AMateConAlpoge/HipotesisAlpoge.lean \
-    AMateConAlpoge/MillerAlpoge.lean; do
+    AMateConAlpoge/MillerAlpoge.lean AMateConAlpoge/CertificadoAlpoge.lean; do
     [ -f "$DIR_PROY/$f" ] || die "falta $f en la versión de AMate"
 done
 (cd "$DIR_PROY" && sha256sum AMateConAlpoge/*.lean AMateDirichlet/*.lean AMateMiller/*.lean) > "$SALIDA/huellas_fuentes.txt"
@@ -99,7 +100,7 @@ name = "AMateMiller"
 [[lean_lib]]
 name = "AMateConAlpoge"
 roots = ["AMateConAlpoge.Composicion", "AMateConAlpoge.ComposicionDirichlet",
-  "AMateConAlpoge.HipotesisAlpoge", "AMateConAlpoge.MillerAlpoge"]
+  "AMateConAlpoge.HipotesisAlpoge", "AMateConAlpoge.MillerAlpoge", "AMateConAlpoge.CertificadoAlpoge"]
 TOML
 chown -R "$USUARIO:" /opt/amate2
 como "cd $DIR_PROY && (lake update tree || lake update)" >> "$SALIDA/registro.txt" 2>&1 || die "falló lake update"
@@ -128,6 +129,7 @@ cat > "$DIR_PROY/VerificacionComposiciones.lean" <<'LEAN'
 import AMateConAlpoge.Composicion
 import AMateConAlpoge.ComposicionDirichlet
 import AMateConAlpoge.MillerAlpoge
+import AMateConAlpoge.CertificadoAlpoge
 #print axioms AMate.energia_subpolinomial_alpoge
 #print axioms AMate.Dirichlet.energia_dirichlet_subpolinomial_alpoge
 #print axioms AMate.Dirichlet.tendsto_log_energia_dirichlet_alpoge
@@ -138,6 +140,9 @@ import AMateConAlpoge.MillerAlpoge
 #print axioms AMate.Miller.hipHadamard_alpoge
 #print axioms AMate.Miller.cota_bach_explicita_alpoge
 #print axioms AMate.Miller.esPrimoMiller_explicito_alpoge
+#print axioms AMate.Miller.esPrimoMiller_certificado_alpoge
+#print axioms AMate.Miller.noResiduo_16_alpoge
+#print axioms AMate.Miller.noResiduo_explicito_alpoge
 LEAN
 chown "$USUARIO:" "$DIR_PROY/VerificacionComposiciones.lean"
 como "cd $DIR_PROY && lake env lean VerificacionComposiciones.lean" > "$SALIDA/axiomas.txt" 2>&1 \
@@ -150,7 +155,7 @@ python3 -I - "$SALIDA/axiomas.txt" <<'PY' || die "aparecen axiomas no estándar 
 import re, sys
 texto = open(sys.argv[1]).read()
 bloques = re.findall(r"depends on axioms: \[([^\]]*)\]", texto, re.S)
-assert len(bloques) == 10, f"se esperaban 10 listas de axiomas y hay {len(bloques)}"
+assert len(bloques) == 13, f"se esperaban 13 listas de axiomas y hay {len(bloques)}"
 for b in bloques:
     ax = {a.strip() for a in b.split(",") if a.strip()}
     assert ax <= {"propext", "Classical.choice", "Quot.sound"}, ax

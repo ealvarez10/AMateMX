@@ -35,7 +35,8 @@ AMate.Miller.cotaSubgruposPropios_of_cotaCaracteres AMate.Miller.esPrimoMiller_c
 AMate.Miller.esPrimoMiller_id_correcto AMate.Miller.cota_caracteres_de_grh' AMate.Miller.esPrimoMiller_de_grh
 AMate.Miller.cota_caracteres_de_grh_cuad' AMate.Miller.esPrimoMiller_de_grh_cuad
 AMate.Miller.Explicito.cota_bach_explicita AMate.Miller.cotaCaracteres_basesExplicitas
-AMate.Miller.esPrimoMiller_explicito"
+AMate.Miller.esPrimoMiller_explicito AMate.Miller.Explicito.cota_bach_16 AMate.Miller.Explicito.cota_bach_4
+AMate.Miller.esPrimoMiller_certificado AMate.Miller.noResiduo_16 AMate.Miller.noResiduo_explicito"
 
 # shellcheck disable=SC2086
 lake env "$LEAN4EXPORT" AMateEnergia AMateDirichlet AMateMiller -- $DECL > "$OUT/amate.ndjson"
@@ -64,7 +65,10 @@ cat > "$OUT/nanoda_config.json" <<EOF
         "AMate.Miller.esPrimoMiller_de_grh",
         "AMate.Miller.esPrimoMiller_de_grh_cuad",
         "AMate.Miller.Explicito.cota_bach_explicita",
-        "AMate.Miller.esPrimoMiller_explicito"
+        "AMate.Miller.esPrimoMiller_explicito",
+        "AMate.Miller.Explicito.cota_bach_16",
+        "AMate.Miller.esPrimoMiller_certificado",
+        "AMate.Miller.noResiduo_16"
     ],
     "pp_output_path": "$OUT/enunciados_nanoda.txt",
     "pp_to_stdout": false,
